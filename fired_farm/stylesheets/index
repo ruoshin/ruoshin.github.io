@@ -1,0 +1,26 @@
+.farm {
+  position: relative;
+  height: 100vh;
+  background: url("/images/index-photo.png") no-repeat center center;
+  background-size: cover;
+  overflow: hidden; }
+  .farm .banner {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2; }
+    .farm .banner h1 img {
+      width: 100%; }
+  .farm .sub-title {
+    font-size: 2em;
+    color: #fff;
+    text-align: center; }
+  .farm .bg-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("/images/index-line.png") no-repeat center center;
+    background-size: cover;
+    z-index: 1; }

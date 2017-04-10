@@ -1,0 +1,19 @@
+<header>
+  <div class='logo'>kkfarm</div>
+  <ul>
+    <li class=''>
+      <a href="/investment.html">INVESTMENT</a>
+    </li>
+    <li class=''>
+      <a href="/qr8.html">QR8</a>
+    </li>
+    <li class=''>
+      <a href="/partners.html">PARTNERS</a>
+    </li>
+    <li class=''>
+      <a href="/about.html">ABOUT</a>
+    </li>
+    <li class=''>
+      <a href="/contact.html">CONTACT</a>
+    </li>
+</header>
