@@ -1,10 +1,13 @@
+@import url(//fonts.googleapis.com/earlyaccess/notosanstc.css);
+
+
 * {
   box-sizing: border-box; }
 
 body {
   padding: 0;
   margin: 0;
-  font-family: "Raleway", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: 'Noto Sans TC', "Raleway", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 16px;
   line-height: 1.5;
   color: #606c71; }
@@ -18,7 +21,7 @@ a {
     text-decoration: underline; }
 
 .title{
-  font-size: 1.5em;
+  font-size: 1.7em;
   margin: 3em 10px 10px;
   text-align: center;
   display: block;
@@ -54,4 +57,18 @@ footer{
 }
 footer .mail{
   color: #606c71;
+}
+
+.skill{
+  border-bottom: 1px solid #e3e3e3;
+  padding-bottom: 40px;
+}
+
+.skill .title{
+  text-align: left;
+  margin-left: 0;
+}
+
+.skill p{
+  text-align: left;
 }
