@@ -72,3 +72,8 @@ footer .mail{
 .skill p{
   text-align: left;
 }
+
+.description{
+  max-width: 900px;
+  margin: 0 auto;
+}
