@@ -4801,6 +4801,10 @@ gatsby-parcel-config@^0.0.1:
     "@parcel/transformer-raw" "^2.3.1"
     "@parcel/transformer-react-refresh-wrap" "^2.3.1"
 
+gatsby-plugin-cname@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/gatsby-plugin-cname/-/gatsby-plugin-cname-1.0.0.tgz#5752d006c476a3c7897fca5c307901df5501747a"
+
 gatsby-plugin-image@^2.4.0:
   version "2.9.0"
   resolved "https://registry.yarnpkg.com/gatsby-plugin-image/-/gatsby-plugin-image-2.9.0.tgz#4656dec9c93aec233792012ec952328e3dd702f7"

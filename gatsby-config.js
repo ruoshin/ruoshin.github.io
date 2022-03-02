@@ -1,12 +1,13 @@
 module.exports = {
   siteMetadata: {
-    siteUrl: "https://www.yourdomain.tld",
+    siteUrl: "https://ruoshin.wang",
     title: "ruoshin.wang",
   },
   plugins: [
     "gatsby-plugin-sass",
     "gatsby-plugin-image",
     "gatsby-plugin-react-helmet",
+    'gatsby-plugin-cname',
     {
       resolve: "gatsby-plugin-manifest",
       options: {
