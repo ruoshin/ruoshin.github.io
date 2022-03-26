@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { StaticImage } from 'gatsby-plugin-image'
+import Spline from '@splinetool/react-spline';
 import '../styles/index.sass'
 
 const RuoshinWang = () => {
@@ -10,6 +11,7 @@ const RuoshinWang = () => {
         <StaticImage src="../images/logo.svg" width="100" quality="100" alt="logo" />
         ruoshin.wang
       </h1>
+      <Spline scene="https://draft.spline.design/H3WvaSqqFaNr8OTR/scene.spline" />
       <StaticImage src="../images/paper-lotus.png" quality="100" alt="logo" />
       <div className='description'>哈囉，我是一位前端工程師，重視設計與功能易用性，希望可以為使用者打造良好體驗的產品。曾經有過後端工程師與網站設計的經驗，可以減少在跨部門間溝通上的誤差。這是我一個簡單的作品展示！</div>
       <div className='projects'>
