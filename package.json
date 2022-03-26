@@ -31,5 +31,9 @@
     "react-dom": "^17.0.1",
     "react-helmet": "^6.1.0",
     "sass": "^1.45.2"
+  },
+  "devDependencies": {
+    "@splinetool/react-spline": "^2.0.0",
+    "@splinetool/runtime": "^0.9.22"
   }
 }
