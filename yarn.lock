@@ -1897,6 +1897,16 @@
     escape-string-regexp "^2.0.0"
     lodash.deburr "^4.1.0"
 
+"@splinetool/react-spline@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@splinetool/react-spline/-/react-spline-2.0.0.tgz#6ac56de3030ec4166d8f65588e6f82f505e05439"
+
+"@splinetool/runtime@^0.9.22":
+  version "0.9.22"
+  resolved "https://registry.yarnpkg.com/@splinetool/runtime/-/runtime-0.9.22.tgz#f8c098d716bd425181db2ec8bd4d89f24ee83a85"
+  dependencies:
+    on-change "^4.0.0"
+
 "@swc/helpers@^0.2.11":
   version "0.2.14"
   resolved "https://registry.yarnpkg.com/@swc/helpers/-/helpers-0.2.14.tgz#20288c3627442339dd3d743c944f7043ee3590f0"
@@ -6616,8 +6626,8 @@ minimatch@^3.0.4, minimatch@^3.1.2:
     brace-expansion "^1.1.7"
 
 minimist@^1.2.0, minimist@^1.2.3, minimist@^1.2.5:
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.5.tgz#67d66014b66a6a8aaa0c083c5fd58df4e4e97602"
+  version "1.2.6"
+  resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.6.tgz#8637a5b759ea0d6e98702cfb3a9283323c93af44"
 
 mitt@^1.2.0:
   version "1.2.0"
@@ -6960,6 +6970,10 @@ objectFitPolyfill@^2.3.5:
 omggif@^1.0.10, omggif@^1.0.9:
   version "1.0.10"
   resolved "https://registry.yarnpkg.com/omggif/-/omggif-1.0.10.tgz#ddaaf90d4a42f532e9e7cb3a95ecdd47f17c7b19"
+
+on-change@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/on-change/-/on-change-4.0.0.tgz#26570babb7170f28be5ea0ba00a284a5a343a472"
 
 on-finished@^2.3.0:
   version "2.4.1"
