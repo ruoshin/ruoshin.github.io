@@ -1,8 +1,11 @@
 import * as React from 'react'
 import { gsap } from "gsap"
+import {ScrollTrigger} from 'gsap/ScrollTrigger'
 import { StaticImage } from 'gatsby-plugin-image'
 // import Spline from '@splinetool/react-spline';
 import '../styles/index.sass'
+
+gsap.registerPlugin(ScrollTrigger);
 
 const RuoshinWang = () => {
 
@@ -10,8 +13,11 @@ const RuoshinWang = () => {
 
   React.useEffect(() => {
     gsap.to(boxRef.current, {
-      rotation: "+=360",
-      repeat: -1
+      rotation: -360,
+      scrollTrigger: {
+        trigger: '.description',
+        scrub: true
+      }
     });
   });
 
