@@ -1,9 +1,10 @@
 import * as React from 'react'
 import { gsap } from "gsap"
-import {ScrollTrigger} from 'gsap/ScrollTrigger'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { StaticImage } from 'gatsby-plugin-image'
 // import Spline from '@splinetool/react-spline';
 import '../styles/index.sass'
+import { Helmet } from "react-helmet"
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -23,7 +24,11 @@ const RuoshinWang = () => {
 
   return (
     <main className='index'>
-      <title>Ruoshin wang</title>
+      <Helmet>
+        <meta charSet="utf-8" />
+        <title>Ruoshin wang</title>
+        <link rel="canonical" href="http://ruoshin.wang" />
+      </Helmet>
       <h1>
         <StaticImage src="../images/logo.svg" width="100" quality="100" alt="logo" />
         ruoshin.wang
