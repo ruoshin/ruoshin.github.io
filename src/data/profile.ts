@@ -14,7 +14,7 @@ export type Profile = {
 
 export const profile: Profile = {
   name: "Ruoshin Wang",
-  title: tx("資深前端工程師", "Senior Front-end Engineer"),
+  title: tx("Senior Front-end Engineer", "Senior Front-end Engineer"),
   tagline: tx(
     "重視設計與功能易用性，為使用者打造良好體驗的產品。",
     "Frontend engineer focused on design and usability — building products that feel good to use.",

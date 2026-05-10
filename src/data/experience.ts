@@ -62,7 +62,10 @@ export const experience: Experience[] = [
       "Maintained the content platform vocus.cc, partnering with designers and backend engineers to iterate on UX and ship architectural and SEO improvements.",
     ),
     highlights: [
-      tx("使用 Next.js 重構平台前端架構", "Refactored the platform frontend on top of Next.js."),
+      tx(
+        "看出舊前端架構對 SEO 不友善，提案並開始用 Next.js 重寫",
+        "Identified SEO limitations in the existing client-side architecture and initiated a Next.js rewrite.",
+      ),
       tx(
         "建立 Storybook，將現有樣式整理為可重複使用的 component",
         "Introduced Storybook and consolidated existing styles into reusable components.",
@@ -71,7 +74,6 @@ export const experience: Experience[] = [
         "新增方格人物訪談頁面，串接後端 API",
         'Shipped the "vocus people" interview page end-to-end with the backend API.',
       ),
-      tx("改善網站 SEO", "Improved on-page SEO across the platform."),
     ],
     stack: ["React", "Next.js", "Storybook", "SCSS"],
   },
