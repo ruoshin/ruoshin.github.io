@@ -9,12 +9,18 @@ Personal portfolio site for Ruoshin Wang (Senior Front-end Engineer), deployed a
 ## Commands
 
 ```sh
-npm run dev      # http://localhost:4321 with HMR
-npm run build    # static build → ./dist
-npm run preview  # serve the production build locally
+npm run dev        # http://localhost:4321 with HMR
+npm run build      # static build → ./dist
+npm run preview    # serve the production build locally
+npm run check      # Biome lint + format check (read-only)
+npm run check:fix  # Biome lint + format auto-fix
+npm run lint       # Biome lint only
+npm run format     # Biome format-write only
 ```
 
-There is no test suite yet. Lint/format are not configured — Tailwind/Astro/TS errors surface during `dev` and `build`.
+There is no test suite yet. Tailwind/Astro/TS errors still surface during `dev` and `build`.
+
+**Biome scope**: configured in [biome.json](biome.json) to cover `src/**/*.{ts,tsx,js,jsx,json}` and the root config files. **`.astro` files are not linted/formatted by Biome** — Biome can't parse the frontmatter. Run `npm run check` before committing TS changes; for `.astro` files, rely on type-checking via `build`.
 
 ## Stack & key architectural choices
 

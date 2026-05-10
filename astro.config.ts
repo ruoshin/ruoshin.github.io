@@ -1,13 +1,13 @@
-import { defineConfig } from 'astro/config';
-import react from '@astrojs/react';
-import sitemap from '@astrojs/sitemap';
-import tailwindcss from '@tailwindcss/vite';
-import { LOCALES, DEFAULT_LOCALE } from './src/lib/i18n';
+import react from "@astrojs/react";
+import sitemap from "@astrojs/sitemap";
+import tailwindcss from "@tailwindcss/vite";
+import { defineConfig } from "astro/config";
+import { DEFAULT_LOCALE, LOCALES } from "./src/lib/i18n";
 
 const sitemapLocales = Object.fromEntries(LOCALES.map((l) => [l, l]));
 
 export default defineConfig({
-  site: 'https://ruoshin.github.io',
+  site: "https://ruoshin.github.io",
   i18n: {
     locales: [...LOCALES],
     defaultLocale: DEFAULT_LOCALE,

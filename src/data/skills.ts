@@ -5,59 +5,51 @@ export type SkillGroup = {
 
 export const skillGroups: SkillGroup[] = [
   {
-    title: 'Languages & Frameworks',
+    title: "Languages & Frameworks",
+    items: ["TypeScript", "JavaScript (ES6+)", "React", "Next.js", "Redux", "Context API", "HTML5"],
+  },
+  {
+    title: "Data & Forms",
+    items: ["TanStack Query", "React Hook Form", "Axios", "REST API"],
+  },
+  {
+    title: "Styling & UI",
     items: [
-      'TypeScript',
-      'JavaScript (ES6+)',
-      'React',
-      'Next.js',
-      'Redux',
-      'Context API',
-      'HTML5',
+      "Tailwind CSS",
+      "Radix UI",
+      "Headless UI",
+      "Chakra UI",
+      "SCSS",
+      "Styled Components",
+      "RWD",
     ],
   },
   {
-    title: 'Data & Forms',
-    items: ['TanStack Query', 'React Hook Form', 'Axios', 'REST API'],
+    title: "Data Visualization",
+    items: ["Recharts", "Chart.js", "React Flow"],
   },
   {
-    title: 'Styling & UI',
-    items: [
-      'Tailwind CSS',
-      'Radix UI',
-      'Headless UI',
-      'Chakra UI',
-      'SCSS',
-      'Styled Components',
-      'RWD',
-    ],
+    title: "Office Integration",
+    items: ["Office.js", "Office Add-in API"],
   },
   {
-    title: 'Data Visualization',
-    items: ['Recharts', 'Chart.js', 'React Flow'],
+    title: "Testing",
+    items: ["Jest", "Playwright"],
   },
   {
-    title: 'Office Integration',
-    items: ['Office.js', 'Office Add-in API'],
+    title: "Build & Tooling",
+    items: ["Vite", "Webpack", "Storybook", "Husky", "lint-staged", "Biome"],
   },
   {
-    title: 'Testing',
-    items: ['Jest', 'Playwright'],
+    title: "Performance & SEO",
+    items: ["Web Vitals", "Lighthouse"],
   },
   {
-    title: 'Build & Tooling',
-    items: ['Vite', 'Webpack', 'Storybook', 'Husky', 'lint-staged', 'Biome'],
+    title: "Collaboration",
+    items: ["Git (Gitflow)", "GitHub", "GitLab", "Figma", "Notion", "Jira", "ClickUp"],
   },
   {
-    title: 'Performance & SEO',
-    items: ['Web Vitals', 'Lighthouse'],
-  },
-  {
-    title: 'Collaboration',
-    items: ['Git (Gitflow)', 'GitHub', 'GitLab', 'Figma', 'Notion', 'Jira', 'ClickUp'],
-  },
-  {
-    title: 'AI-assisted Development',
-    items: ['Claude Code', 'Claude design'],
+    title: "AI-assisted Development",
+    items: ["Claude Code", "Claude design"],
   },
 ];
