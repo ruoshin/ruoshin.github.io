@@ -1,9 +1,16 @@
 ---
 import Section from "./Section.astro";
 import { skillGroups } from "../data/skills";
+import { getLocale, ui } from "../lib/i18n";
+
+const locale = getLocale(Astro.currentLocale);
 ---
 
-<Section id="skills" label="Skills" title="Tools of the trade.">
+<Section
+  id="skills"
+  label={ui.skillsLabel[locale]}
+  title={ui.skillsTitle[locale]}
+>
   <div class="grid sm:grid-cols-2 gap-x-10 gap-y-8">
     {
       skillGroups.map((group) => (

@@ -1,39 +1,51 @@
 ---
 import { profile } from "../data/profile";
+import { getLocale, ui } from "../lib/i18n";
+
+const locale = getLocale(Astro.currentLocale);
 ---
 
 <section
   id="top"
-  class="max-w-5xl mx-auto px-6 pt-20 pb-16 md:pt-32 md:pb-24"
+  class="relative max-w-5xl mx-auto px-6 pt-20 pb-16 md:pt-32 md:pb-24 overflow-hidden"
 >
-  <p
-    class="font-mono text-xs uppercase tracking-widest text-[var(--color-accent)]"
-  >
-    Hi, I'm {profile.name}
-  </p>
-  <h1
-    class="mt-4 text-4xl md:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.05]"
-  >
-    {profile.title}<span class="text-[var(--color-accent)]">.</span>
-  </h1>
-  <p
-    class="mt-6 max-w-2xl text-lg md:text-xl text-[var(--color-muted)] leading-relaxed"
-  >
-    {profile.tagline}
-  </p>
-  <div class="mt-10 flex flex-wrap gap-3 text-sm">
-    <a
-      href="#experience"
-      class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[var(--color-fg)] bg-[var(--color-fg)] text-[var(--color-bg)] hover:opacity-80 transition-opacity"
+  <div class="hero-bg" aria-hidden="true"></div>
+
+  <div class="hero-stagger">
+    <p
+      class="font-mono text-xs uppercase tracking-widest text-[var(--color-accent)]"
     >
-      View experience
-      <span aria-hidden="true">↓</span>
-    </a>
-    <a
-      href={`mailto:${profile.email}`}
-      class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[var(--color-border)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors"
+      {ui.heroEyebrow[locale]}
+    </p>
+    <h1
+      class="mt-4 text-4xl md:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.05]"
     >
-      Get in touch
-    </a>
+      {profile.title[locale]}<span class="text-[var(--color-accent)]">.</span>
+    </h1>
+    <p
+      class="mt-6 max-w-2xl text-lg md:text-xl text-[var(--color-muted)] leading-relaxed"
+    >
+      {profile.tagline[locale]}
+    </p>
+    <div class="mt-10 flex flex-wrap gap-3 text-sm">
+      <a
+        href="#experience"
+        class="group inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[var(--color-fg)] bg-[var(--color-fg)] text-[var(--color-bg)] hover:opacity-80 transition-opacity"
+      >
+        {ui.heroCtaPrimary[locale]}
+        <span
+          aria-hidden="true"
+          class="transition-transform group-hover:translate-y-0.5"
+        >
+          ↓
+        </span>
+      </a>
+      <a
+        href={`mailto:${profile.email}`}
+        class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[var(--color-border)] hover:border-[var(--color-secondary)] hover:text-[var(--color-secondary)] transition-colors"
+      >
+        {ui.heroCtaSecondary[locale]}
+      </a>
+    </div>
   </div>
 </section>

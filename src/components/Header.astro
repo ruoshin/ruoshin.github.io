@@ -1,12 +1,17 @@
 ---
 import ThemeToggle from "./ThemeToggle.astro";
+import LanguageToggle from "./LanguageToggle.astro";
 import { profile } from "../data/profile";
+import { getLocale, localePath, ui } from "../lib/i18n";
+
+const locale = getLocale(Astro.currentLocale);
+const home = localePath(locale);
 
 const nav = [
-  { label: "About", href: "#about" },
-  { label: "Experience", href: "#experience" },
-  { label: "Skills", href: "#skills" },
-  { label: "Contact", href: "#contact" },
+  { label: ui.navAbout[locale], href: `${home}#about` },
+  { label: ui.navExperience[locale], href: `${home}#experience` },
+  { label: ui.navSkills[locale], href: `${home}#skills` },
+  { label: ui.navContact[locale], href: `${home}#contact` },
 ];
 ---
 
@@ -17,7 +22,7 @@ const nav = [
     class="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between gap-6"
   >
     <a
-      href="#top"
+      href={`${home}#top`}
       class="font-mono text-sm tracking-tight hover:text-[var(--color-accent)] transition-colors"
     >
       {profile.name.toLowerCase().replace(" ", ".")}
@@ -36,6 +41,9 @@ const nav = [
         ))
       }
     </nav>
-    <ThemeToggle />
+    <div class="flex items-center gap-2">
+      <LanguageToggle />
+      <ThemeToggle />
+    </div>
   </div>
 </header>

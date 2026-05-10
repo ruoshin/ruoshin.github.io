@@ -1,6 +1,8 @@
 ---
 import { profile } from "../data/profile";
+import { getLocale, ui } from "../lib/i18n";
 
+const locale = getLocale(Astro.currentLocale);
 const year = new Date().getFullYear();
 ---
 
@@ -12,7 +14,7 @@ const year = new Date().getFullYear();
   >
     <span>© {year} {profile.name}</span>
     <span class="font-mono text-xs">
-      Built with Astro · Tailwind CSS · GitHub Pages
+      {ui.footerBuilt[locale]}
     </span>
   </div>
 </footer>

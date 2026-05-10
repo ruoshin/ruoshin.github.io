@@ -34,6 +34,27 @@ Page content lives in typed TS modules under [src/data/](src/data/), separate fr
 
 When asked to "update content" or "add a job/skill", edit these files — do not touch the components. Components in [src/components/](src/components/) iterate over these arrays and should remain content-agnostic.
 
+## i18n
+
+Bilingual site (`zh-Hant` default at `/`, `en` at `/en/`) configured via Astro's built-in i18n in [astro.config.ts](astro.config.ts) with `prefixDefaultLocale: false`. The locale list is defined once in [src/lib/i18n.ts](src/lib/i18n.ts) and imported by `astro.config.ts` — to add a new locale, edit `LOCALES` / `DEFAULT_LOCALE` there and add a `Locale` key to every `Localized<T>` value.
+
+- All translatable strings live in [src/lib/i18n.ts](src/lib/i18n.ts) (UI strings) and as `Localized` fields inside [src/data/](src/data/) modules. The `Localized<T> = Record<Locale, T>` type means every translatable value is an object with `'zh-Hant'` and `'en'` keys — both must be present for the build to type-check.
+- Components read locale via `getLocale(Astro.currentLocale)` and look up strings as `value[locale]` or `ui.someKey[locale]`. **Never hard-code Chinese or English strings inside components** — add a key to `ui` in `src/lib/i18n.ts` instead.
+- The locale toggle is a plain `<a>` to the other locale's URL, computed by `localePath()` / `otherLocale()`. No JS state.
+- The two pages [src/pages/index.astro](src/pages/index.astro) and [src/pages/en/index.astro](src/pages/en/index.astro) are intentionally near-identical wrappers — they only exist so Astro generates two routes. Component-level locale awareness handles the rest.
+- When adding a new translatable string: add it to `src/lib/i18n.ts` `ui` (UI text) or to a `Localized` field in `src/data/` (content). Update both `'zh-Hant'` and `'en'` together.
+
+## Animations & View Transitions
+
+[src/layouts/BaseLayout.astro](src/layouts/BaseLayout.astro) mounts Astro's `<ClientRouter />`, so language switches use SPA-style view transitions instead of full reloads.
+
+Two animation primitives, both pure-CSS, defined in [src/styles/global.css](src/styles/global.css):
+
+- **`.hero-stagger`** — applied to a parent; first 4 children fade-up with staggered delay. Runs once on load (CSS animation, not transition).
+- **`.reveal`** — opt-in scroll reveal. Element starts hidden, gets `[data-revealed]` set by the IntersectionObserver script in `BaseLayout.astro` when scrolled into view. The script binds to `astro:page-load`, so it re-runs after every view transition. **Do not run animation setup in a regular `<script>` without listening to `astro:page-load`** — it won't fire after navigations.
+
+Both animation systems no-op cleanly under `prefers-reduced-motion: reduce` (handled in `global.css`).
+
 ## Theming
 
 Light/dark theme uses **CSS custom properties**, not Tailwind's `theme.colors`:
@@ -51,4 +72,4 @@ The site is a single long-scroll page composed in [src/pages/index.astro](src/pa
 
 `.github/workflows/deploy.yml` runs on push to `master` (and `workflow_dispatch`), uses `withastro/action@v3` with Node 22, and publishes to GitHub Pages. The repo's **Settings → Pages → Source must be set to "GitHub Actions"** for the deploy step to succeed.
 
-Because this is a `username.github.io` user-page (not a project page), the site lives at the domain root and `base` is `/` — the default. Do not add a `base` to `astro.config.mjs`.
+Because this is a `username.github.io` user-page (not a project page), the site lives at the domain root and `base` is `/` — the default. Do not add a `base` to `astro.config.ts`.

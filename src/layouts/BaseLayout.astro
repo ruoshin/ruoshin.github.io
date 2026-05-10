@@ -1,22 +1,25 @@
 ---
 import "../styles/global.css";
+import { ClientRouter } from "astro:transitions";
 import { profile } from "../data/profile";
+import { getLocale, ui } from "../lib/i18n";
 
 interface Props {
   title?: string;
   description?: string;
 }
 
-const {
-  title = `${profile.name} — ${profile.title}`,
-  description = profile.tagline,
-} = Astro.props;
+const locale = getLocale(Astro.currentLocale);
+
+const defaultTitle = `${profile.name} — ${profile.title[locale]}`;
+const { title = defaultTitle, description = ui.metaDescription[locale] } =
+  Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site).toString();
 ---
 
 <!doctype html>
-<html lang="zh-Hant">
+<html lang={locale}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -31,7 +34,12 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={locale === "en" ? "en_US" : "zh_TW"} />
     <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="alternate" hreflang="zh-Hant" href={new URL("/", Astro.site).toString()} />
+    <link rel="alternate" hreflang="en" href={new URL("/en/", Astro.site).toString()} />
+    <link rel="alternate" hreflang="x-default" href={new URL("/", Astro.site).toString()} />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -39,6 +47,8 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
     />
+
+    <ClientRouter />
 
     <script is:inline>
       // Set theme before paint to avoid FOUC
@@ -55,5 +65,32 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
 
   <body class="min-h-screen flex flex-col">
     <slot />
+
+    <script>
+      // Scroll-reveal: observe `.reveal` elements and set data-revealed when visible.
+      // Re-runs on every Astro page navigation via the astro:page-load event.
+      function setupReveal() {
+        const targets = document.querySelectorAll<HTMLElement>(
+          ".reveal:not([data-revealed])",
+        );
+        if (targets.length === 0) return;
+
+        const observer = new IntersectionObserver(
+          (entries, obs) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) {
+                entry.target.setAttribute("data-revealed", "");
+                obs.unobserve(entry.target);
+              }
+            }
+          },
+          { threshold: 0.12, rootMargin: "0px 0px -10% 0px" },
+        );
+
+        targets.forEach((el) => observer.observe(el));
+      }
+
+      document.addEventListener("astro:page-load", setupReveal);
+    </script>
   </body>
 </html>

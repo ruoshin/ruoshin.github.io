@@ -1,0 +1,16 @@
+---
+import { getLocale, otherLocale, localePath, ui } from "../lib/i18n";
+
+const locale = getLocale(Astro.currentLocale);
+const target = otherLocale(locale);
+const href = localePath(target);
+---
+
+<a
+  href={href}
+  class="font-mono text-xs uppercase tracking-widest inline-flex items-center justify-center h-9 px-3 rounded-full border border-[var(--color-border)] hover:border-[var(--color-secondary)] hover:text-[var(--color-secondary)] transition-colors"
+  aria-label={ui.langToggleAria[locale]}
+  hreflang={target === "en" ? "en" : "zh-Hant"}
+>
+  {ui.langToggleLabel[locale]}
+</a>
