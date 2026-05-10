@@ -1,0 +1,25 @@
+---
+import Section from "./Section.astro";
+import { skillGroups } from "../data/skills";
+---
+
+<Section id="skills" label="Skills" title="Tools of the trade.">
+  <div class="grid sm:grid-cols-2 gap-x-10 gap-y-8">
+    {
+      skillGroups.map((group) => (
+        <div>
+          <h3 class="font-mono text-xs uppercase tracking-widest text-[var(--color-accent)]">
+            {group.title}
+          </h3>
+          <ul class="mt-3 flex flex-wrap gap-1.5">
+            {group.items.map((item) => (
+              <li class="text-sm px-2.5 py-1 rounded-md bg-[var(--color-subtle)] text-[var(--color-fg)]/85">
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
+  </div>
+</Section>

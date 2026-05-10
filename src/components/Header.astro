@@ -1,0 +1,41 @@
+---
+import ThemeToggle from "./ThemeToggle.astro";
+import { profile } from "../data/profile";
+
+const nav = [
+  { label: "About", href: "#about" },
+  { label: "Experience", href: "#experience" },
+  { label: "Skills", href: "#skills" },
+  { label: "Contact", href: "#contact" },
+];
+---
+
+<header
+  class="sticky top-0 z-30 backdrop-blur-md bg-[var(--color-bg)]/80 border-b border-[var(--color-border)]"
+>
+  <div
+    class="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between gap-6"
+  >
+    <a
+      href="#top"
+      class="font-mono text-sm tracking-tight hover:text-[var(--color-accent)] transition-colors"
+    >
+      {profile.name.toLowerCase().replace(" ", ".")}
+    </a>
+    <nav
+      class="hidden md:flex items-center gap-6 text-sm text-[var(--color-muted)]"
+    >
+      {
+        nav.map((item) => (
+          <a
+            href={item.href}
+            class="hover:text-[var(--color-fg)] transition-colors"
+          >
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+    <ThemeToggle />
+  </div>
+</header>

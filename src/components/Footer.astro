@@ -1,0 +1,18 @@
+---
+import { profile } from "../data/profile";
+
+const year = new Date().getFullYear();
+---
+
+<footer
+  class="mt-auto border-t border-[var(--color-border)] py-8 text-sm text-[var(--color-muted)]"
+>
+  <div
+    class="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row gap-2 sm:gap-6 sm:items-center sm:justify-between"
+  >
+    <span>© {year} {profile.name}</span>
+    <span class="font-mono text-xs">
+      Built with Astro · Tailwind CSS · GitHub Pages
+    </span>
+  </div>
+</footer>

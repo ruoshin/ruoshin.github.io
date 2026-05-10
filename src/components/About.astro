@@ -1,0 +1,42 @@
+---
+import Section from "./Section.astro";
+import { profile } from "../data/profile";
+
+const facets = [
+  {
+    title: "Frontend",
+    body: "十年以上 React 與現代前端工具鏈經驗，從產品架構到細節互動都能掌握。",
+  },
+  {
+    title: "Backend-aware",
+    body: "曾任 PHP 後端工程師，能與後端工程師有效對話、共同設計 API 與資料流。",
+  },
+  {
+    title: "Design-aware",
+    body: "前端設計背景出身，熟悉 Figma 與設計協作流程，能還原並提出可行性建議。",
+  },
+];
+---
+
+<Section id="about" label="About" title="Cross-functional by design.">
+  <div class="space-y-6 text-[var(--color-fg)]/85 leading-relaxed">
+    <p class="text-lg">
+      {profile.bio}
+    </p>
+  </div>
+
+  <div class="mt-10 grid sm:grid-cols-3 gap-4">
+    {
+      facets.map((facet) => (
+        <div class="p-5 rounded-lg border border-[var(--color-border)] bg-[var(--color-subtle)]/40">
+          <h3 class="font-mono text-xs uppercase tracking-widest text-[var(--color-accent)]">
+            {facet.title}
+          </h3>
+          <p class="mt-2 text-sm leading-relaxed text-[var(--color-fg)]/80">
+            {facet.body}
+          </p>
+        </div>
+      ))
+    }
+  </div>
+</Section>
