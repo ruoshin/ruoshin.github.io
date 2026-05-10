@@ -1,0 +1,92 @@
+---
+import { Image } from "astro:assets";
+import Section from "./Section.astro";
+import { otherImages, projects } from "@/data/projects";
+import { getLocale, ui } from "@/lib/i18n";
+
+const locale = getLocale(Astro.currentLocale);
+---
+
+<Section
+  id="projects"
+  label={ui.projectsLabel[locale]}
+  title={ui.projectsTitle[locale]}
+>
+  <div class="space-y-14">
+    {
+      projects.map((project) => (
+        <article class="space-y-4">
+          <header>
+            <h3 class="text-lg md:text-xl font-semibold tracking-tight">
+              <span>{project.name}</span>
+              {project.client && (
+                <span class="text-[var(--color-muted)] font-normal">
+                  {" "}
+                  · {project.client[locale]}
+                </span>
+              )}
+            </h3>
+            {project.summary && (
+              <p class="mt-2 text-[var(--color-fg)]/80 leading-relaxed">
+                {project.summary[locale]}
+              </p>
+            )}
+          </header>
+
+          <ul class="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {project.images.map((img) => (
+              <li class="rounded-lg overflow-hidden border border-[var(--color-border)] bg-[var(--color-subtle)]">
+                <Image
+                  src={img.src}
+                  alt={img.alt[locale]}
+                  widths={[400, 800, 1200]}
+                  sizes="(max-width: 768px) 50vw, 33vw"
+                  loading="lazy"
+                  class="w-full h-auto block"
+                />
+              </li>
+            ))}
+          </ul>
+
+          {project.stack && project.stack.length > 0 && (
+            <ul class="flex flex-wrap gap-1.5">
+              {project.stack.map((tech) => (
+                <li class="font-mono text-[11px] px-2 py-0.5 rounded-full border border-[var(--color-border)] text-[var(--color-muted)]">
+                  {tech}
+                </li>
+              ))}
+            </ul>
+          )}
+        </article>
+      ))
+    }
+
+    <article class="space-y-4">
+      <header>
+        <h3 class="text-lg md:text-xl font-semibold tracking-tight">
+          {ui.projectsOthers[locale]}
+        </h3>
+        <p class="mt-2 text-[var(--color-fg)]/80 leading-relaxed">
+          {ui.projectsOthersSummary[locale]}
+        </p>
+      </header>
+
+      <ul class="grid grid-cols-2 md:grid-cols-3 gap-3">
+        {
+          otherImages.map((img) => (
+            <li class="rounded-lg overflow-hidden border border-[var(--color-border)] bg-[var(--color-subtle)]">
+              <Image
+                src={img.src}
+                alt={img.alt[locale]}
+                widths={[400, 800, 1200]}
+                sizes="(max-width: 768px) 50vw, 33vw"
+                loading="lazy"
+                class="w-full h-auto block"
+              />
+            </li>
+          ))
+        }
+      </ul>
+    </article>
+  </div>
+</Section>

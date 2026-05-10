@@ -34,6 +34,7 @@ export const ui = {
 
   navAbout: { "zh-Hant": "About", en: "About" },
   navExperience: { "zh-Hant": "Experience", en: "Experience" },
+  navProjects: { "zh-Hant": "Projects", en: "Projects" },
   navSkills: { "zh-Hant": "Skills", en: "Skills" },
   navContact: { "zh-Hant": "Contact", en: "Contact" },
 
@@ -79,6 +80,17 @@ export const ui = {
   experienceTitle: {
     "zh-Hant": "我建造東西的地方。",
     en: "Where I've built things.",
+  },
+
+  projectsLabel: { "zh-Hant": "Projects", en: "Projects" },
+  projectsTitle: {
+    "zh-Hant": "做過的東西。",
+    en: "Things I've made.",
+  },
+  projectsOthers: { "zh-Hant": "Others", en: "Others" },
+  projectsOthersSummary: {
+    "zh-Hant": "其他作品與練習。",
+    en: "Other works and explorations.",
   },
 
   skillsLabel: { "zh-Hant": "Skills", en: "Skills" },
