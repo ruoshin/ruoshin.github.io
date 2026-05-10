@@ -1,4 +1,4 @@
-import { tx, type Localized } from '../lib/i18n';
+import { tx, type Localized } from '@/lib/i18n';
 
 export type Experience = {
   company: string;

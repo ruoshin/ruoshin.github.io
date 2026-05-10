@@ -21,7 +21,7 @@ There is no test suite yet. Lint/format are not configured — Tailwind/Astro/TS
 - **Astro 5** with `output: "static"` (default). All pages are pre-rendered at build time — no SSR.
 - **React 19** is installed via `@astrojs/react` for future interactive islands, but **no React component is currently mounted**. The `_astro/client.*.js` chunk produced at build is unreferenced by `index.html` and ships zero JS to the page.
 - **Tailwind CSS 4** via `@tailwindcss/vite` (NOT the legacy `@astrojs/tailwind` integration). There is **no `tailwind.config.js`** — all customization is CSS-first in [src/styles/global.css](src/styles/global.css) using `@theme { ... }`.
-- **TypeScript strict** (`astro/tsconfigs/strict`) with `~/*` path alias mapped to `src/*`.
+- **TypeScript strict** (`astro/tsconfigs/strict`) with `@/*` path alias mapped to `./src/*`. All cross-directory imports inside `src/` use the alias — relative `../` paths inside `src/` are a smell.
 - **Branch is `master`, not `main`** — both for git and the deploy workflow trigger.
 
 ## Content-as-data pattern
