@@ -1,0 +1,54 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project
+
+Personal portfolio site for Ruoshin Wang (Senior Front-end Engineer), deployed at https://ruoshin.github.io as a GitHub user-page. Primary use case: showcasing experience for job interviews.
+
+## Commands
+
+```sh
+npm run dev      # http://localhost:4321 with HMR
+npm run build    # static build → ./dist
+npm run preview  # serve the production build locally
+```
+
+There is no test suite yet. Lint/format are not configured — Tailwind/Astro/TS errors surface during `dev` and `build`.
+
+## Stack & key architectural choices
+
+- **Astro 5** with `output: "static"` (default). All pages are pre-rendered at build time — no SSR.
+- **React 19** is installed via `@astrojs/react` for future interactive islands, but **no React component is currently mounted**. The `_astro/client.*.js` chunk produced at build is unreferenced by `index.html` and ships zero JS to the page.
+- **Tailwind CSS 4** via `@tailwindcss/vite` (NOT the legacy `@astrojs/tailwind` integration). There is **no `tailwind.config.js`** — all customization is CSS-first in [src/styles/global.css](src/styles/global.css) using `@theme { ... }`.
+- **TypeScript strict** (`astro/tsconfigs/strict`) with `~/*` path alias mapped to `src/*`.
+- **Branch is `master`, not `main`** — both for git and the deploy workflow trigger.
+
+## Content-as-data pattern
+
+Page content lives in typed TS modules under [src/data/](src/data/), separate from layout/presentation:
+
+- [src/data/profile.ts](src/data/profile.ts) — name, title, bio, contact links
+- [src/data/experience.ts](src/data/experience.ts) — work history (rendered as a timeline)
+- [src/data/skills.ts](src/data/skills.ts) — grouped skill chips
+
+When asked to "update content" or "add a job/skill", edit these files — do not touch the components. Components in [src/components/](src/components/) iterate over these arrays and should remain content-agnostic.
+
+## Theming
+
+Light/dark theme uses **CSS custom properties**, not Tailwind's `theme.colors`:
+
+- Tokens (`--color-bg`, `--color-fg`, `--color-muted`, `--color-subtle`, `--color-border`, `--color-accent`, `--color-accent-hover`) are defined on `:root` and overridden under `.dark` in [src/styles/global.css](src/styles/global.css).
+- In components, **always reference tokens via bracket syntax**: `bg-[var(--color-bg)]`, `text-[var(--color-fg)]`. Do **not** use raw Tailwind palette classes like `bg-zinc-900` for themeable colors — they break dark mode.
+- Dark mode is enabled by toggling `.dark` on `<html>`. The variant is wired up in `global.css` via `@custom-variant dark (&:where(.dark, .dark *))`.
+- Theme is persisted in `localStorage["theme"]`. An inline `<script is:inline>` in [src/layouts/BaseLayout.astro](src/layouts/BaseLayout.astro) reads it before paint to prevent FOUC. **Don't move that script** — it must run before the body renders.
+
+## Page composition
+
+The site is a single long-scroll page composed in [src/pages/index.astro](src/pages/index.astro). Section components (Hero, About, Experience, Skills, Contact) all wrap [src/components/Section.astro](src/components/Section.astro) for consistent label/title/body layout — Hero is the exception (custom layout for the headline).
+
+## Deployment
+
+`.github/workflows/deploy.yml` runs on push to `master` (and `workflow_dispatch`), uses `withastro/action@v3` with Node 22, and publishes to GitHub Pages. The repo's **Settings → Pages → Source must be set to "GitHub Actions"** for the deploy step to succeed.
+
+Because this is a `username.github.io` user-page (not a project page), the site lives at the domain root and `base` is `/` — the default. Do not add a `base` to `astro.config.mjs`.
