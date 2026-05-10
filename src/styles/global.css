@@ -5,34 +5,35 @@
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Noto Sans TC",
     "PingFang TC", "Microsoft JhengHei", sans-serif;
+  --font-serif: "Fraunces", "Noto Serif TC", "Source Han Serif TC", "Songti TC",
+    "STSong", serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco,
     Consolas, monospace;
 
-  --color-bg: oklch(0.99 0.002 80);
-  --color-fg: oklch(0.22 0.012 265);
-  --color-muted: oklch(0.55 0.012 265);
-  --color-subtle: oklch(0.95 0.006 80);
-  --color-border: oklch(0.9 0.008 80);
-  /* Primary: orange-red */
-  --color-accent: oklch(0.62 0.2 35);
-  --color-accent-hover: oklch(0.55 0.21 32);
+  /* Warm cream background, royal-blue ink, orange accent */
+  --color-bg: oklch(0.97 0.022 80);
+  --color-fg: oklch(0.28 0.12 265);
+  --color-muted: oklch(0.5 0.07 265);
+  --color-subtle: oklch(0.93 0.04 75);
+  --color-border: oklch(0.85 0.04 70);
+  /* Primary: vibrant orange */
+  --color-accent: oklch(0.66 0.21 38);
+  --color-accent-hover: oklch(0.58 0.22 35);
   /* Secondary: royal blue */
-  --color-secondary: oklch(0.46 0.18 265);
-  --color-secondary-hover: oklch(0.4 0.18 265);
+  --color-secondary: oklch(0.42 0.18 265);
+  --color-secondary-hover: oklch(0.36 0.19 265);
 }
 
 .dark {
-  --color-bg: oklch(0.17 0.012 265);
-  --color-fg: oklch(0.96 0.005 80);
-  --color-muted: oklch(0.66 0.015 80);
-  --color-subtle: oklch(0.23 0.014 265);
-  --color-border: oklch(0.32 0.012 265);
-  /* Primary: orange-red (lighter for dark bg) */
-  --color-accent: oklch(0.75 0.18 38);
-  --color-accent-hover: oklch(0.82 0.16 40);
-  /* Secondary: royal blue (lighter for dark bg) */
-  --color-secondary: oklch(0.72 0.15 255);
-  --color-secondary-hover: oklch(0.8 0.13 255);
+  --color-bg: oklch(0.2 0.06 265);
+  --color-fg: oklch(0.95 0.025 75);
+  --color-muted: oklch(0.72 0.04 75);
+  --color-subtle: oklch(0.27 0.07 265);
+  --color-border: oklch(0.36 0.07 265);
+  --color-accent: oklch(0.78 0.18 42);
+  --color-accent-hover: oklch(0.85 0.16 45);
+  --color-secondary: oklch(0.78 0.13 255);
+  --color-secondary-hover: oklch(0.85 0.11 255);
 }
 
 html {
@@ -105,17 +106,85 @@ a {
   z-index: -1;
   background:
     radial-gradient(
-      55% 70% at 85% 10%,
-      color-mix(in oklch, var(--color-accent) 18%, transparent) 0%,
-      transparent 60%
+      55% 70% at 88% 8%,
+      color-mix(in oklch, var(--color-accent) 22%, transparent) 0%,
+      transparent 62%
     ),
     radial-gradient(
-      45% 60% at 5% 90%,
-      color-mix(in oklch, var(--color-secondary) 14%, transparent) 0%,
-      transparent 60%
+      45% 60% at 4% 88%,
+      color-mix(in oklch, var(--color-secondary) 20%, transparent) 0%,
+      transparent 62%
     );
   mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
   -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+}
+
+/* Display headings — pair the cream/orange palette with a characterful serif */
+.font-display {
+  font-family: var(--font-serif);
+  font-optical-sizing: auto;
+  font-variation-settings: "SOFT" 50, "WONK" 0;
+  letter-spacing: -0.02em;
+}
+
+/* Floating decoration helpers — keep behind text, never block pointers */
+.deco {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes float-y {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  @keyframes float-xy {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(6px, -6px) rotate(4deg); }
+    50% { transform: translate(0, -12px) rotate(0deg); }
+    75% { transform: translate(-6px, -6px) rotate(-4deg); }
+  }
+  @keyframes spin-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  @keyframes pulse-soft {
+    0%, 100% { transform: scale(1); opacity: 0.85; }
+    50% { transform: scale(1.18); opacity: 1; }
+  }
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(-6deg); }
+    50% { transform: rotate(6deg); }
+  }
+  .deco-float { animation: float-y 6s ease-in-out infinite; }
+  .deco-float-slow { animation: float-y 9s ease-in-out infinite; }
+  .deco-drift { animation: float-xy 11s ease-in-out infinite; }
+  .deco-spin { animation: spin-slow 22s linear infinite; }
+  .deco-spin-fast { animation: spin-slow 12s linear infinite; }
+  .deco-pulse { animation: pulse-soft 3.5s ease-in-out infinite; }
+  .deco-wiggle { animation: wiggle 5s ease-in-out infinite; }
+}
+
+/* Hand-drawn underline under section titles */
+.title-underline {
+  position: relative;
+  display: inline-block;
+}
+.title-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.35em;
+  height: 0.45em;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 12' preserveAspectRatio='none'><path d='M2 8 Q 20 2 38 8 T 74 8 T 118 8' stroke='%23ed6a2a' stroke-width='2.5' fill='none' stroke-linecap='round'/></svg>");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  pointer-events: none;
+}
+.dark .title-underline::after {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 12' preserveAspectRatio='none'><path d='M2 8 Q 20 2 38 8 T 74 8 T 118 8' stroke='%23ffa46b' stroke-width='2.5' fill='none' stroke-linecap='round'/></svg>");
 }
 
 /* View Transitions: smoother default name animation for body */

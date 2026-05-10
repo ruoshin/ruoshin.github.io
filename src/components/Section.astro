@@ -1,22 +1,60 @@
 ---
+import Decoration from "./Decoration.astro";
+
+export type DecoColor = "accent" | "secondary";
+
+export interface SectionScheme {
+  blob: { color: DecoColor; position: string };
+  spark: { color: DecoColor; position: string };
+  star: { color: DecoColor; position: string };
+}
+
 interface Props {
   id: string;
   label: string;
   title: string;
+  scheme?: SectionScheme;
 }
 
-const { id, label, title } = Astro.props;
+const { id, label, title, scheme } = Astro.props;
 ---
 
-<section id={id} class="max-w-5xl mx-auto px-6 py-20 md:py-28 scroll-mt-16">
-  <div class="grid md:grid-cols-[180px_1fr] gap-6 md:gap-12">
+<section
+  id={id}
+  class="relative max-w-5xl mx-auto px-6 py-20 md:py-28 scroll-mt-16 overflow-hidden"
+>
+  {
+    scheme && (
+      <>
+        <Decoration
+          variant="blob"
+          color={scheme.blob.color}
+          class={`deco deco-drift opacity-[0.06] ${scheme.blob.position}`}
+        />
+        <Decoration
+          variant="spark"
+          color={scheme.spark.color}
+          class={`deco deco-pulse hidden md:block ${scheme.spark.position}`}
+        />
+        <Decoration
+          variant="star"
+          color={scheme.star.color}
+          class={`deco deco-spin hidden md:block opacity-70 ${scheme.star.position}`}
+        />
+      </>
+    )
+  }
+
+  <div class="relative grid md:grid-cols-[180px_1fr] gap-6 md:gap-12">
     <div class="md:pt-2 reveal">
       <span
-        class="font-mono text-xs uppercase tracking-widest text-[var(--color-accent)]"
-        >{label}</span
+        class="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-[var(--color-accent)]"
       >
-      <h2 class="mt-2 text-2xl md:text-3xl font-semibold tracking-tight">
-        {title}
+        <Decoration variant="spark" color="accent" class="w-3 deco-pulse" />
+        {label}
+      </span>
+      <h2 class="font-display mt-2 text-3xl md:text-4xl font-semibold">
+        <span class="title-underline">{title}</span>
       </h2>
     </div>
     <div class="min-w-0 reveal reveal-delay">

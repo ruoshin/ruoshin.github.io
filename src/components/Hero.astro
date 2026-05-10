@@ -1,8 +1,22 @@
 ---
+import Decoration from "./Decoration.astro";
 import { profile } from "@/data/profile";
 import { getLocale, ui } from "@/lib/i18n";
 
 const locale = getLocale(Astro.currentLocale);
+
+const decorations = [
+  { variant: "blob",     color: "secondary", class: "deco-drift opacity-[0.08] -top-10 -right-16 w-72 md:w-96" },
+  { variant: "blob",     color: "accent",    class: "deco-float-slow opacity-[0.06] bottom-0 -left-20 w-72" },
+  { variant: "star",     color: "accent",    class: "deco-spin hidden md:block top-20 right-28 w-12" },
+  { variant: "star",     color: "secondary", class: "deco-spin-fast hidden md:block bottom-12 right-40 w-7 opacity-80" },
+  { variant: "spark",    color: "secondary", class: "deco-pulse hidden md:block top-44 right-12 w-6" },
+  { variant: "spark",    color: "accent",    class: "deco-pulse hidden md:block top-72 right-44 w-4" },
+  { variant: "dots",     color: "secondary", class: "deco-float hidden md:block top-10 right-60 w-20 opacity-60" },
+  { variant: "squiggle", color: "secondary", class: "deco-float hidden md:block bottom-20 left-2 w-36" },
+  { variant: "hump",     color: "accent",    class: "deco-float-slow hidden md:block bottom-40 left-44 w-28 opacity-80" },
+  { variant: "arc",      color: "secondary", class: "hidden lg:block top-32 left-8 w-20 opacity-70 -rotate-12" },
+] as const;
 ---
 
 <section
@@ -11,26 +25,34 @@ const locale = getLocale(Astro.currentLocale);
 >
   <div class="hero-bg" aria-hidden="true"></div>
 
-  <div class="hero-stagger">
+  {
+    decorations.map((d) => (
+      <Decoration variant={d.variant} color={d.color} class={`deco ${d.class}`} />
+    ))
+  }
+
+  <div class="hero-stagger relative">
     <p
-      class="font-mono text-xs uppercase tracking-widest text-[var(--color-accent)]"
+      class="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-[var(--color-accent)]"
     >
+      <Decoration variant="spark" color="accent" class="w-3.5 deco-pulse" />
       {ui.heroEyebrow[locale]}
     </p>
     <h1
-      class="mt-4 text-4xl md:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.05]"
+      class="font-display mt-4 text-5xl md:text-7xl lg:text-8xl font-semibold leading-[1.02]"
     >
-      {profile.title[locale]}<span class="text-[var(--color-accent)]">.</span>
+      <span class="title-underline">{profile.title[locale]}</span><span
+        class="inline-block text-[var(--color-accent)] deco-pulse">.</span>
     </h1>
     <p
-      class="mt-6 max-w-2xl text-lg md:text-xl text-[var(--color-muted)] leading-relaxed"
+      class="mt-6 max-w-2xl text-lg md:text-xl text-[var(--color-fg)]/75 leading-relaxed"
     >
       {profile.tagline[locale]}
     </p>
     <div class="mt-10 flex flex-wrap gap-3 text-sm">
       <a
         href="#experience"
-        class="group inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[var(--color-fg)] bg-[var(--color-fg)] text-[var(--color-bg)] hover:opacity-80 transition-opacity"
+        class="group inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--color-accent)] text-[var(--color-bg)] font-medium shadow-[0_8px_24px_-12px_var(--color-accent)] hover:bg-[var(--color-accent-hover)] hover:-translate-y-0.5 transition-all"
       >
         {ui.heroCtaPrimary[locale]}
         <span
@@ -42,7 +64,7 @@ const locale = getLocale(Astro.currentLocale);
       </a>
       <a
         href={`mailto:${profile.email}`}
-        class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[var(--color-border)] hover:border-[var(--color-secondary)] hover:text-[var(--color-secondary)] transition-colors"
+        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border-2 border-[var(--color-secondary)] text-[var(--color-secondary)] hover:bg-[var(--color-secondary)] hover:text-[var(--color-bg)] transition-colors"
       >
         {ui.heroCtaSecondary[locale]}
       </a>

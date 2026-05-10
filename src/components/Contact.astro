@@ -1,15 +1,22 @@
 ---
-import Section from "./Section.astro";
+import Section, { type SectionScheme } from "./Section.astro";
 import { profile } from "@/data/profile";
 import { getLocale, ui } from "@/lib/i18n";
 
 const locale = getLocale(Astro.currentLocale);
+
+const scheme: SectionScheme = {
+  blob: { color: "secondary", position: "top-8 -right-24 w-80" },
+  spark: { color: "accent", position: "bottom-12 right-8 w-6" },
+  star: { color: "accent", position: "top-32 -left-8 w-9" },
+};
 ---
 
 <Section
   id="contact"
   label={ui.contactLabel[locale]}
   title={ui.contactTitle[locale]}
+  scheme={scheme}
 >
   <p class="text-lg text-[var(--color-fg)]/85 leading-relaxed">
     {ui.contactBody[locale]}
@@ -18,7 +25,7 @@ const locale = getLocale(Astro.currentLocale);
   <div class="mt-8 flex flex-wrap items-center gap-3">
     <a
       href={`mailto:${profile.email}`}
-      class="inline-flex items-center gap-2 px-5 py-3 rounded-full border border-[var(--color-fg)] bg-[var(--color-fg)] text-[var(--color-bg)] hover:opacity-80 transition-opacity"
+      class="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-[var(--color-accent)] text-[var(--color-bg)] font-medium shadow-[0_8px_24px_-12px_var(--color-accent)] hover:bg-[var(--color-accent-hover)] hover:-translate-y-0.5 transition-all"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -41,7 +48,7 @@ const locale = getLocale(Astro.currentLocale);
       href={profile.links.github}
       target="_blank"
       rel="noopener noreferrer"
-      class="inline-flex items-center gap-2 px-5 py-3 rounded-full border border-[var(--color-border)] hover:border-[var(--color-secondary)] hover:text-[var(--color-secondary)] transition-colors"
+      class="inline-flex items-center gap-2 px-5 py-3 rounded-full border-2 border-[var(--color-secondary)] text-[var(--color-secondary)] hover:bg-[var(--color-secondary)] hover:text-[var(--color-bg)] transition-colors"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

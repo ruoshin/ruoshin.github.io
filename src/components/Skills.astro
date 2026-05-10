@@ -1,15 +1,22 @@
 ---
-import Section from "./Section.astro";
+import Section, { type SectionScheme } from "./Section.astro";
 import { skillGroups } from "@/data/skills";
 import { getLocale, ui } from "@/lib/i18n";
 
 const locale = getLocale(Astro.currentLocale);
+
+const scheme: SectionScheme = {
+  blob: { color: "accent", position: "bottom-10 -right-20 w-72" },
+  spark: { color: "secondary", position: "top-12 right-12 w-5" },
+  star: { color: "secondary", position: "bottom-32 -left-4 w-8" },
+};
 ---
 
 <Section
   id="skills"
   label={ui.skillsLabel[locale]}
   title={ui.skillsTitle[locale]}
+  scheme={scheme}
 >
   <div class="grid sm:grid-cols-2 gap-x-10 gap-y-8">
     {
@@ -20,7 +27,7 @@ const locale = getLocale(Astro.currentLocale);
           </h3>
           <ul class="mt-3 flex flex-wrap gap-1.5">
             {group.items.map((item) => (
-              <li class="text-sm px-2.5 py-1 rounded-md bg-[var(--color-subtle)] text-[var(--color-fg)]/85">
+              <li class="text-sm px-3 py-1 rounded-full bg-[var(--color-subtle)] text-[var(--color-fg)]/85 hover:bg-[var(--color-accent)] hover:text-[var(--color-bg)] hover:-translate-y-0.5 transition-all cursor-default">
                 {item}
               </li>
             ))}

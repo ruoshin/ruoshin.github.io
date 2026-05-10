@@ -1,17 +1,24 @@
 ---
 import ExternalLink from "./ExternalLink.astro";
 import ProjectThumbnail from "./ProjectThumbnail.astro";
-import Section from "./Section.astro";
+import Section, { type SectionScheme } from "./Section.astro";
 import { otherImages, projects } from "@/data/projects";
 import { getLocale, ui } from "@/lib/i18n";
 
 const locale = getLocale(Astro.currentLocale);
+
+const scheme: SectionScheme = {
+  blob: { color: "secondary", position: "-top-10 -right-16 w-72" },
+  spark: { color: "accent", position: "bottom-32 right-4 w-5" },
+  star: { color: "accent", position: "top-16 -left-6 w-9" },
+};
 ---
 
 <Section
   id="projects"
   label={ui.projectsLabel[locale]}
   title={ui.projectsTitle[locale]}
+  scheme={scheme}
 >
   <div class="space-y-14">
     {

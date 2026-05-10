@@ -1,5 +1,6 @@
 ---
-import Section from "./Section.astro";
+import Decoration from "./Decoration.astro";
+import Section, { type SectionScheme } from "./Section.astro";
 import { profile } from "@/data/profile";
 import { getLocale, ui } from "@/lib/i18n";
 
@@ -19,12 +20,19 @@ const facets = [
     body: ui.aboutFacetDesignBody[locale],
   },
 ];
+
+const scheme: SectionScheme = {
+  blob: { color: "secondary", position: "top-8 -right-20 w-72" },
+  spark: { color: "accent", position: "top-20 right-10 w-5" },
+  star: { color: "accent", position: "bottom-24 -left-10 w-8" },
+};
 ---
 
 <Section
   id="about"
   label={ui.aboutLabel[locale]}
   title={ui.aboutTitle[locale]}
+  scheme={scheme}
 >
   <div class="space-y-6 text-[var(--color-fg)]/85 leading-relaxed">
     <p class="text-lg">
@@ -32,10 +40,15 @@ const facets = [
     </p>
   </div>
 
-  <div class="mt-10 grid sm:grid-cols-3 gap-4">
+  <div class="relative mt-10 grid sm:grid-cols-3 gap-4">
+    <Decoration
+      variant="blob"
+      color="accent"
+      class="deco opacity-[0.06] -top-8 -right-8 w-56 rotate-12"
+    />
     {
       facets.map((facet) => (
-        <div class="p-5 rounded-lg border border-[var(--color-border)] bg-[var(--color-subtle)]/40">
+        <div class="relative p-5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-subtle)]/60 hover:bg-[var(--color-subtle)] hover:-translate-y-1 hover:shadow-[0_12px_28px_-18px_var(--color-accent)] transition-all duration-300">
           <h3 class="font-mono text-xs uppercase tracking-widest text-[var(--color-accent)]">
             {facet.title}
           </h3>
