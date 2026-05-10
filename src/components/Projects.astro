@@ -1,5 +1,6 @@
 ---
-import { Image } from "astro:assets";
+import ExternalLink from "./ExternalLink.astro";
+import ProjectThumbnail from "./ProjectThumbnail.astro";
 import Section from "./Section.astro";
 import { otherImages, projects } from "@/data/projects";
 import { getLocale, ui } from "@/lib/i18n";
@@ -18,7 +19,17 @@ const locale = getLocale(Astro.currentLocale);
         <article class="space-y-4">
           <header>
             <h3 class="text-lg md:text-xl font-semibold tracking-tight">
-              <span>{project.name}</span>
+              {project.href ? (
+                <ExternalLink
+                  href={project.href}
+                  class="hover:text-[var(--color-accent)] transition-colors"
+                >
+                  {project.name}
+                  <span class="font-mono text-sm text-[var(--color-muted)]"> ↗</span>
+                </ExternalLink>
+              ) : (
+                <span>{project.name}</span>
+              )}
               {project.client && (
                 <span class="text-[var(--color-muted)] font-normal">
                   {" "}
@@ -35,16 +46,7 @@ const locale = getLocale(Astro.currentLocale);
 
           <ul class="grid grid-cols-2 md:grid-cols-3 gap-3">
             {project.images.map((img) => (
-              <li class="rounded-lg overflow-hidden border border-[var(--color-border)] bg-[var(--color-subtle)]">
-                <Image
-                  src={img.src}
-                  alt={img.alt[locale]}
-                  widths={[400, 800, 1200]}
-                  sizes="(max-width: 768px) 50vw, 33vw"
-                  loading="lazy"
-                  class="w-full h-auto block"
-                />
-              </li>
+              <ProjectThumbnail img={img} locale={locale} />
             ))}
           </ul>
 
@@ -72,20 +74,7 @@ const locale = getLocale(Astro.currentLocale);
       </header>
 
       <ul class="grid grid-cols-2 md:grid-cols-3 gap-3">
-        {
-          otherImages.map((img) => (
-            <li class="rounded-lg overflow-hidden border border-[var(--color-border)] bg-[var(--color-subtle)]">
-              <Image
-                src={img.src}
-                alt={img.alt[locale]}
-                widths={[400, 800, 1200]}
-                sizes="(max-width: 768px) 50vw, 33vw"
-                loading="lazy"
-                class="w-full h-auto block"
-              />
-            </li>
-          ))
-        }
+        {otherImages.map((img) => <ProjectThumbnail img={img} locale={locale} />)}
       </ul>
     </article>
   </div>

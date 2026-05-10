@@ -1,4 +1,5 @@
 ---
+import ExternalLink from "./ExternalLink.astro";
 import Section from "./Section.astro";
 import { experience } from "@/data/experience";
 import { getLocale, ui } from "@/lib/i18n";
@@ -21,7 +22,17 @@ const locale = getLocale(Astro.currentLocale);
               <span>{job.role[locale]}</span>
               <span class="text-[var(--color-muted)] font-normal">
                 {" "}
-                · {job.company}
+                ·{" "}
+                {job.href ? (
+                  <ExternalLink
+                    href={job.href}
+                    class="hover:text-[var(--color-accent)] transition-colors"
+                  >
+                    {job.company}
+                  </ExternalLink>
+                ) : (
+                  job.company
+                )}
               </span>
             </h3>
             <span class="font-mono text-xs text-[var(--color-muted)] tabular-nums">

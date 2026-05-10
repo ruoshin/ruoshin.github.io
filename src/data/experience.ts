@@ -2,6 +2,7 @@ import { type Localized, tx } from "@/lib/i18n";
 
 export type Experience = {
   company: string;
+  href?: string;
   role: Localized;
   period: string;
   summary: Localized;
@@ -12,6 +13,7 @@ export type Experience = {
 export const experience: Experience[] = [
   {
     company: "Actuaviz",
+    href: "https://www.actuaviz.com",
     role: tx("資深前端工程師", "Senior Front-end Developer"),
     period: "2021.10 — Present",
     summary: tx(
@@ -52,6 +54,7 @@ export const experience: Experience[] = [
   },
   {
     company: "新銳數位 / vocus.cc",
+    href: "https://vocus.cc",
     role: tx("前端工程師", "Front-end Developer"),
     period: "2019.11 — 2020.11",
     summary: tx(
@@ -74,6 +77,7 @@ export const experience: Experience[] = [
   },
   {
     company: "Infocast / Nucleus",
+    href: "https://lihsunco.com/",
     role: tx("前端工程師", "Front-end Developer"),
     period: "2015.6 — 2019.6",
     summary: tx(
@@ -102,6 +106,7 @@ export const experience: Experience[] = [
   },
   {
     company: "北士設計 PACE Design",
+    href: "https://pace.com.tw",
     role: tx("前端設計師", "Front-end Designer"),
     period: "2015.1 — 2015.6",
     summary: tx(

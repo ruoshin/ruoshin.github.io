@@ -1,0 +1,41 @@
+---
+import { Image } from "astro:assets";
+import ExternalLink from "@/components/ExternalLink.astro";
+import type { ProjectImage } from "@/data/projects";
+import type { Locale } from "@/lib/i18n";
+
+interface Props {
+  img: ProjectImage;
+  locale: Locale;
+}
+
+const { img, locale } = Astro.props;
+---
+
+<li
+  class="rounded-lg overflow-hidden border border-[var(--color-border)] bg-[var(--color-subtle)]"
+>
+  {
+    img.href ? (
+      <ExternalLink href={img.href} class="block hover:opacity-90 transition-opacity">
+        <Image
+          src={img.src}
+          alt={img.alt[locale]}
+          widths={[400, 800, 1200]}
+          sizes="(max-width: 768px) 50vw, 33vw"
+          loading="lazy"
+          class="w-full h-auto block"
+        />
+      </ExternalLink>
+    ) : (
+      <Image
+        src={img.src}
+        alt={img.alt[locale]}
+        widths={[400, 800, 1200]}
+        sizes="(max-width: 768px) 50vw, 33vw"
+        loading="lazy"
+        class="w-full h-auto block"
+      />
+    )
+  }
+</li>

@@ -20,6 +20,7 @@ import { type Localized, tx } from "@/lib/i18n";
 export type ProjectImage = {
   src: ImageMetadata;
   alt: Localized;
+  href?: string;
 };
 
 export type Project = {
@@ -27,6 +28,7 @@ export type Project = {
   name: string;
   client?: Localized;
   summary?: Localized;
+  href?: string;
   images: ProjectImage[];
   stack?: string[];
 };
@@ -40,6 +42,7 @@ export const projects: Project[] = [
       "以 Next.js 重構平台前端架構，導入 Storybook 將樣式整理為可重用元件。",
       "Refactored the platform on Next.js and consolidated styles into reusable components with Storybook.",
     ),
+    href: "https://vocus.cc",
     images: [
       { src: vocus01, alt: tx("vocus.cc 介面截圖一", "vocus.cc UI screenshot 1") },
       { src: vocus02, alt: tx("vocus.cc 介面截圖二", "vocus.cc UI screenshot 2") },
@@ -69,9 +72,9 @@ export const projects: Project[] = [
 
 export const otherImages: ProjectImage[] = [
   { src: allianz, alt: tx("Allianz", "Allianz") },
-  { src: ohstudy01, alt: tx("OHStudy 一", "OHStudy 1") },
-  { src: ohstudy02, alt: tx("OHStudy 二", "OHStudy 2") },
-  { src: ohstudy03, alt: tx("OHStudy 三", "OHStudy 3") },
+  { src: ohstudy01, alt: tx("OHStudy 一", "OHStudy 1"), href: "https://ohstudy.net" },
+  { src: ohstudy02, alt: tx("OHStudy 二", "OHStudy 2"), href: "https://ohstudy.net" },
+  { src: ohstudy03, alt: tx("OHStudy 三", "OHStudy 3"), href: "https://ohstudy.net" },
   { src: umai01, alt: tx("Umai 一", "Umai 1") },
   { src: umai02, alt: tx("Umai 二", "Umai 2") },
   { src: li01, alt: tx("LI", "LI") },
