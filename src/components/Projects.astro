@@ -2,7 +2,7 @@
 import ExternalLink from "./ExternalLink.astro";
 import ProjectThumbnail from "./ProjectThumbnail.astro";
 import Section, { type SectionScheme } from "./Section.astro";
-import { otherImages, projects } from "@/data/projects";
+import { projects } from "@/data/projects";
 import { getLocale, ui } from "@/lib/i18n";
 
 const locale = getLocale(Astro.currentLocale);
@@ -69,20 +69,5 @@ const scheme: SectionScheme = {
         </article>
       ))
     }
-
-    <article class="space-y-4">
-      <header>
-        <h3 class="text-lg md:text-xl font-semibold tracking-tight">
-          {ui.projectsOthers[locale]}
-        </h3>
-        <p class="mt-2 text-[var(--color-fg)]/80 leading-relaxed">
-          {ui.projectsOthersSummary[locale]}
-        </p>
-      </header>
-
-      <ul class="grid grid-cols-2 md:grid-cols-3 gap-3">
-        {otherImages.map((img) => <ProjectThumbnail img={img} locale={locale} />)}
-      </ul>
-    </article>
   </div>
 </Section>

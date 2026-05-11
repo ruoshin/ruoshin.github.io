@@ -87,11 +87,6 @@ export const ui = {
     "zh-Hant": "做過的東西。",
     en: "Things I've made.",
   },
-  projectsOthers: { "zh-Hant": "Others", en: "Others" },
-  projectsOthersSummary: {
-    "zh-Hant": "其他作品與練習。",
-    en: "Other works and explorations.",
-  },
 
   skillsLabel: { "zh-Hant": "Skills", en: "Skills" },
   skillsTitle: {
