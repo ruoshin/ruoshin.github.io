@@ -26,9 +26,15 @@
   --color-secondary: oklch(0.42 0.18 265);
   --color-secondary-hover: oklch(0.36 0.19 265);
 
-  /* Bonsai silhouette colors */
-  --color-leaf-deep: oklch(0.36 0.09 145);
-  --color-earth-dark:oklch(0.24 0.04 50);
+  /* Bonsai palette — per-object low-poly silhouette colors. */
+  --bonsai-leaf:     oklch(0.42 0.12 145);
+  --bonsai-sage:     oklch(0.70 0.08 135);
+  --bonsai-mustard:  oklch(0.72 0.14 95);
+  --bonsai-terra:    oklch(0.60 0.14 35);
+  --bonsai-rose:     oklch(0.72 0.10 15);
+  --bonsai-lavender: oklch(0.62 0.10 295);
+  --bonsai-teal:     oklch(0.55 0.11 200);
+  --bonsai-clay:     oklch(0.45 0.06 50);
 }
 
 .dark {
@@ -42,8 +48,14 @@
   --color-secondary: oklch(0.78 0.13 255);
   --color-secondary-hover: oklch(0.85 0.11 255);
 
-  --color-leaf-deep: oklch(0.45 0.1 145);
-  --color-earth-dark:oklch(0.28 0.04 50);
+  --bonsai-leaf:     oklch(0.55 0.12 145);
+  --bonsai-sage:     oklch(0.78 0.08 135);
+  --bonsai-mustard:  oklch(0.80 0.14 95);
+  --bonsai-terra:    oklch(0.70 0.14 35);
+  --bonsai-rose:     oklch(0.80 0.10 15);
+  --bonsai-lavender: oklch(0.72 0.10 295);
+  --bonsai-teal:     oklch(0.68 0.11 200);
+  --bonsai-clay:     oklch(0.60 0.06 50);
 }
 
 html {

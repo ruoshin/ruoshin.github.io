@@ -2,7 +2,8 @@
 import Pot from "./Pot.astro";
 import Tree from "./Tree.astro";
 import Branch from "./Branch.astro";
-import { bonsaiBranches } from "@/data/bonsai-mapping";
+import Kinoko from "./Kinoko.astro";
+import { bonsaiBranches, bonsaiDecorations } from "@/data/bonsai-mapping";
 
 interface Props {
   class?: string;
@@ -11,32 +12,48 @@ const { class: className = "" } = Astro.props;
 ---
 
 <div class={`bonsai-perspective ${className}`}>
-  <div class="bonsai-stage" data-bonsai-rotator>
-    <!-- Pot — flat at z=0, doesn't rotate. -->
+  <!-- Three independent preserve-3d contexts sharing the same tilt.
+       DOM order = paint order (since cross-context elements don't 3D z-sort):
+         1. Pot (back) — body + rim, behind soil
+         2. Soil (mid) — covers pot's rim interior, visible green ellipse
+         3. Stage (front) — tree + orbiting branches + kinokos always on top -->
+  <div class="bonsai-back-context">
     <div class="bonsai-pot">
       <Pot class="block w-full" />
     </div>
+  </div>
 
-    <!-- Soil surface — horizontal disc in the XZ plane at the pot rim level.
-         Branches stand on this; their orbital ring is contained within the disc. -->
-    <div class="bonsai-soil-anchor">
-      <div class="bonsai-soil"></div>
-    </div>
+  <div class="bonsai-soil-context">
+    <div class="bonsai-soil"></div>
+  </div>
 
+  <div class="bonsai-stage" data-bonsai-rotator>
     <!-- Central tree, billboarded, no orbit. -->
     <div class="bonsai-tree">
       <Tree class="block w-full" />
     </div>
 
-    <!-- Branches scattered in inner and outer rings around the tree. -->
+    <!-- Branches (experience-linked) scattered in inner and outer rings. -->
     {
       bonsaiBranches.map((b) => (
         <div
-          class="bonsai-branch"
+          class="bonsai-orbiter bonsai-branch"
           data-experience-id={b.experienceId}
-          style={`--theta: ${b.angle}deg; --r: ${b.radius}px; --tilt: ${b.tilt}deg; --scale: ${b.scale};`}
+          style={`color: var(--bonsai-${b.color}); --theta: ${b.angle}deg; --r: ${b.radius}px; --tilt: ${b.tilt}deg; --scale: ${b.scale};`}
         >
           <Branch class="block w-full" />
+        </div>
+      ))
+    }
+
+    <!-- Decorative mushrooms — same orbit transform, smaller footprint. -->
+    {
+      bonsaiDecorations.map((d) => (
+        <div
+          class="bonsai-orbiter bonsai-kinoko"
+          style={`color: var(--bonsai-${d.color}); --theta: ${d.angle}deg; --r: ${d.radius}px; --tilt: ${d.tilt}deg; --scale: ${d.scale};`}
+        >
+          <Kinoko class="block w-full" />
         </div>
       ))
     }
@@ -54,13 +71,22 @@ const { class: className = "" } = Astro.props;
     perspective-origin: 50% 50%;
   }
 
+  .bonsai-back-context,
+  .bonsai-soil-context,
   .bonsai-stage {
     position: absolute;
     inset: 0;
     transform-style: preserve-3d;
-    /* Bird's-eye tilt so the orbital plane projects as a visible ellipse. */
-    transform: rotateX(20deg);
+    /* Shared bird's-eye tilt. Negative rotateX = looking down on the scene:
+       points further from camera (back of orbit, -Z) rise on screen,
+       points closer (front of orbit, +Z) sink.
+       NOTE: if changing this angle, also update Pot.astro's rim ellipse
+       ry/rx ratio to match sin(|angle|) so the pot keeps the same tilt. */
+    transform: rotateX(-20deg);
     transform-origin: 50% 75%;
+  }
+
+  .bonsai-stage {
     /* Animated by GSAP. Clockwise from viewer = decreasing value. */
     --rotation: 0deg;
   }
@@ -72,26 +98,21 @@ const { class: className = "" } = Astro.props;
     bottom: 0;
     width: 52%;
     transform: translate3d(-50%, 0, 0);
+    color: var(--bonsai-clay);
   }
 
-  /* Soil disc — anchored at (50%, 21% from bottom), centered, then rotated
-     90° around X so it lies in the XZ plane. */
-  .bonsai-soil-anchor {
+  /* Soil disc — horizontal in its own XZ plane. Radius 160 must be >= max
+     orbital radius (currently 155 for actuaViz) so trajectories stay
+     within the ellipse. */
+  .bonsai-soil {
     position: absolute;
     left: 50%;
     bottom: 21%;
-    width: 0;
-    height: 0;
-  }
-  .bonsai-soil {
-    position: absolute;
-    top: 0;
-    left: 0;
     width: 320px;
     height: 320px;
     border-radius: 50%;
-    background: var(--color-leaf-deep);
-    transform: translate(-50%, -50%) rotateX(90deg);
+    background: var(--bonsai-sage);
+    transform: translate(-50%, 50%) rotateX(90deg);
     transform-origin: 50% 50%;
   }
 
@@ -102,24 +123,23 @@ const { class: className = "" } = Astro.props;
     bottom: 21%;
     width: 32%;
     transform: translate3d(-50%, 0, 0);
+    color: var(--bonsai-leaf);
   }
 
-  /* Branches — orbit around the central tree, each at its own (θ, r, scale, tilt).
-     Transform chain:
-       1. translate -50% in X so the branch's bottom-center sits on the anchor.
+  /* Orbiters — branches and decorations both orbit the central tree using
+     this transform chain. Per-instance vars: --theta, --r, --scale, --tilt.
+       1. translate -50% in X so the element's bottom-center sits on the anchor.
        2. rotateY by (θ + rotation): orients the local frame outward.
-       3. translateZ(r): pushes the branch out along local +Z.
+       3. translateZ(r): pushes the element out along local +Z.
        4. rotateY by -(θ + rotation): counter-rotation (billboard).
        5. rotate(tilt): organic in-plane lean.
        6. scale(scale): size variation.
   */
-  .bonsai-branch {
+  .bonsai-orbiter {
     position: absolute;
     left: 50%;
     bottom: 21%;
-    width: 11%;
     transform-origin: 50% 100%;
-    transform-style: preserve-3d;
     transform:
       translate3d(-50%, 0, 0)
       rotateY(calc(var(--theta) + var(--rotation, 0deg)))
@@ -130,8 +150,11 @@ const { class: className = "" } = Astro.props;
     will-change: transform;
   }
 
+  .bonsai-branch { width: 11%; }
+  .bonsai-kinoko { width: 8%; }
+
   .bonsai-tree svg,
-  .bonsai-branch svg {
+  .bonsai-orbiter svg {
     display: block;
     width: 100%;
     height: auto;
