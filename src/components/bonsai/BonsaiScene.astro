@@ -1,0 +1,192 @@
+---
+import Pot from "./Pot.astro";
+import Tree from "./Tree.astro";
+import Branch from "./Branch.astro";
+import { bonsaiBranches } from "@/data/bonsai-mapping";
+
+interface Props {
+  class?: string;
+}
+const { class: className = "" } = Astro.props;
+---
+
+<div class={`bonsai-perspective ${className}`}>
+  <div class="bonsai-stage" data-bonsai-rotator>
+    <!-- Pot — flat at z=0, doesn't rotate. -->
+    <div class="bonsai-pot">
+      <Pot class="block w-full" />
+    </div>
+
+    <!-- Soil surface — horizontal disc in the XZ plane at the pot rim level.
+         Branches stand on this; their orbital ring is contained within the disc. -->
+    <div class="bonsai-soil-anchor">
+      <div class="bonsai-soil"></div>
+    </div>
+
+    <!-- Central tree, billboarded, no orbit. -->
+    <div class="bonsai-tree">
+      <Tree class="block w-full" />
+    </div>
+
+    <!-- Branches scattered in inner and outer rings around the tree. -->
+    {
+      bonsaiBranches.map((b) => (
+        <div
+          class="bonsai-branch"
+          data-experience-id={b.experienceId}
+          style={`--theta: ${b.angle}deg; --r: ${b.radius}px; --tilt: ${b.tilt}deg; --scale: ${b.scale};`}
+        >
+          <Branch class="block w-full" />
+        </div>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .bonsai-perspective {
+    position: relative;
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto;
+    aspect-ratio: 640 / 580;
+    perspective: 1400px;
+    perspective-origin: 50% 50%;
+  }
+
+  .bonsai-stage {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+    /* Bird's-eye tilt so the orbital plane projects as a visible ellipse. */
+    transform: rotateX(20deg);
+    transform-origin: 50% 75%;
+    /* Animated by GSAP. Clockwise from viewer = decreasing value. */
+    --rotation: 0deg;
+  }
+
+  /* Pot — centered, no Z offset (sits on rotation axis). */
+  .bonsai-pot {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 52%;
+    transform: translate3d(-50%, 0, 0);
+  }
+
+  /* Soil disc — anchored at (50%, 21% from bottom), centered, then rotated
+     90° around X so it lies in the XZ plane. */
+  .bonsai-soil-anchor {
+    position: absolute;
+    left: 50%;
+    bottom: 21%;
+    width: 0;
+    height: 0;
+  }
+  .bonsai-soil {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    background: var(--color-leaf-deep);
+    transform: translate(-50%, -50%) rotateX(90deg);
+    transform-origin: 50% 50%;
+  }
+
+  /* Tree — centered, billboarded at orbit center. No orbit transform applied. */
+  .bonsai-tree {
+    position: absolute;
+    left: 50%;
+    bottom: 21%;
+    width: 32%;
+    transform: translate3d(-50%, 0, 0);
+  }
+
+  /* Branches — orbit around the central tree, each at its own (θ, r, scale, tilt).
+     Transform chain:
+       1. translate -50% in X so the branch's bottom-center sits on the anchor.
+       2. rotateY by (θ + rotation): orients the local frame outward.
+       3. translateZ(r): pushes the branch out along local +Z.
+       4. rotateY by -(θ + rotation): counter-rotation (billboard).
+       5. rotate(tilt): organic in-plane lean.
+       6. scale(scale): size variation.
+  */
+  .bonsai-branch {
+    position: absolute;
+    left: 50%;
+    bottom: 21%;
+    width: 11%;
+    transform-origin: 50% 100%;
+    transform-style: preserve-3d;
+    transform:
+      translate3d(-50%, 0, 0)
+      rotateY(calc(var(--theta) + var(--rotation, 0deg)))
+      translate3d(0, 0, var(--r, 100px))
+      rotateY(calc(-1 * (var(--theta) + var(--rotation, 0deg))))
+      rotate(var(--tilt, 0deg))
+      scale(var(--scale, 1));
+    will-change: transform;
+  }
+
+  .bonsai-tree svg,
+  .bonsai-branch svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bonsai-stage { --rotation: 0deg !important; }
+  }
+</style>
+
+<script>
+  import { gsap } from "gsap";
+
+  // Track tweens per stage so they can be killed before a view transition
+  // swaps the DOM out — otherwise the old tween keeps running and writing
+  // --rotation to a detached element on every locale switch.
+  const tweens = new WeakMap<HTMLElement, gsap.core.Tween>();
+
+  function setupBonsai() {
+    const stages = document.querySelectorAll<HTMLElement>(
+      "[data-bonsai-rotator]:not([data-bonsai-init])",
+    );
+    if (stages.length === 0) return;
+
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    for (const stage of stages) {
+      stage.setAttribute("data-bonsai-init", "");
+      if (reduceMotion) continue;
+
+      const state = { r: 0 };
+      const tween = gsap.to(state, {
+        r: -360, // negative rotateY = clockwise from viewer's perspective
+        duration: 60,
+        repeat: -1,
+        ease: "none",
+        onUpdate: () => {
+          stage.style.setProperty("--rotation", `${state.r}deg`);
+        },
+      });
+      tweens.set(stage, tween);
+    }
+  }
+
+  function teardownBonsai() {
+    document
+      .querySelectorAll<HTMLElement>("[data-bonsai-rotator][data-bonsai-init]")
+      .forEach((stage) => {
+        tweens.get(stage)?.kill();
+        tweens.delete(stage);
+      });
+  }
+
+  document.addEventListener("astro:page-load", setupBonsai);
+  document.addEventListener("astro:before-swap", teardownBonsai);
+</script>

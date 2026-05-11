@@ -1,0 +1,62 @@
+---
+import BonsaiScene from "./bonsai/BonsaiScene.astro";
+import { profile } from "@/data/profile";
+import { getLocale, ui } from "@/lib/i18n";
+
+const locale = getLocale(Astro.currentLocale);
+---
+
+<section
+  id="top"
+  class="relative min-h-[100svh] overflow-hidden px-6 pt-20 pb-12 md:pt-24 md:pb-16 grid grid-rows-[auto_1fr_auto] gap-6"
+>
+  <div class="hero-bg" aria-hidden="true"></div>
+
+  <!-- top: eyebrow + name -->
+  <header class="relative z-10 w-full max-w-5xl mx-auto">
+    <p
+      class="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-[var(--color-accent)]"
+    >
+      {ui.heroEyebrow[locale]}
+    </p>
+    <h1
+      class="font-display mt-3 text-4xl md:text-5xl lg:text-6xl font-semibold leading-[1.05]"
+    >
+      <span class="title-underline">{profile.title[locale]}</span><span
+        class="inline-block text-[var(--color-accent)]">.</span
+      >
+    </h1>
+  </header>
+
+  <!-- center: bonsai scene -->
+  <div class="relative z-10 flex items-center justify-center">
+    <BonsaiScene />
+  </div>
+
+  <!-- bottom: tagline + CTAs -->
+  <footer class="relative z-10 w-full max-w-5xl mx-auto">
+    <p
+      class="max-w-2xl text-base md:text-lg text-[var(--color-fg)]/75 leading-relaxed"
+    >
+      {profile.tagline[locale]}
+    </p>
+    <div class="mt-6 flex flex-wrap gap-3 text-sm">
+      <a
+        href="#experience"
+        class="group inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--color-accent)] text-[var(--color-bg)] font-medium shadow-[0_8px_24px_-12px_var(--color-accent)] hover:bg-[var(--color-accent-hover)] hover:-translate-y-0.5 transition-all"
+      >
+        {ui.heroCtaPrimary[locale]}
+        <span
+          aria-hidden="true"
+          class="transition-transform group-hover:translate-y-0.5">↓</span
+        >
+      </a>
+      <a
+        href={`mailto:${profile.email}`}
+        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border-2 border-[var(--color-secondary)] text-[var(--color-secondary)] hover:bg-[var(--color-secondary)] hover:text-[var(--color-bg)] transition-colors"
+      >
+        {ui.heroCtaSecondary[locale]}
+      </a>
+    </div>
+  </footer>
+</section>
