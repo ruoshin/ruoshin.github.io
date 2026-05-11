@@ -35,8 +35,10 @@ There is no test suite yet. Tailwind/Astro/TS errors still surface during `dev` 
 Page content lives in typed TS modules under [src/data/](src/data/), separate from layout/presentation:
 
 - [src/data/profile.ts](src/data/profile.ts) — name, title, bio, contact links
-- [src/data/experience.ts](src/data/experience.ts) — work history (rendered as a timeline)
+- [src/data/experience.ts](src/data/experience.ts) — work history, surfaced via the bonsai popup (one panel per entry)
+- [src/data/projects.ts](src/data/projects.ts) — project showcases; each project's `experienceId` links it to an entry in `experience.ts` so it renders inline inside that role's popup
 - [src/data/skills.ts](src/data/skills.ts) — grouped skill chips
+- [src/data/bonsai-mapping.ts](src/data/bonsai-mapping.ts) — orbit positions/colors for the plants, plus `bonsaiTreeExperienceId` (which experience the central tree represents)
 
 When asked to "update content" or "add a job/skill", edit these files — do not touch the components. Components in [src/components/](src/components/) iterate over these arrays and should remain content-agnostic.
 
@@ -72,7 +74,9 @@ Light/dark theme uses **CSS custom properties**, not Tailwind's `theme.colors`:
 
 ## Page composition
 
-The site is a single long-scroll page composed in [src/pages/index.astro](src/pages/index.astro). Section components (Hero, About, Experience, Skills, Contact) all wrap [src/components/Section.astro](src/components/Section.astro) for consistent label/title/body layout — Hero is the exception (custom layout for the headline).
+The site is a single long-scroll page composed in [src/pages/index.astro](src/pages/index.astro). Section components (Hero, About, Skills, Contact) all wrap [src/components/Section.astro](src/components/Section.astro) for consistent label/title/body layout — Hero is the exception (custom layout for the headline).
+
+Experience and project details are **not** a section — they live in [src/components/ExperiencePopup.astro](src/components/ExperiencePopup.astro), a native `<dialog>` mounted inside the Hero. Clicking a bonsai plant or the central tree (both in [src/components/bonsai/BonsaiScene.astro](src/components/bonsai/BonsaiScene.astro)) dispatches an `experience:open` CustomEvent with `{ id }`; the popup listens and shows the matching panel. Any new button can trigger the popup by adding `data-open-experience="<experienceId>"` — the popup script binds those automatically. To wire a new plant or expose a different "main" role on the tree, edit [src/data/bonsai-mapping.ts](src/data/bonsai-mapping.ts).
 
 ## Deployment
 
