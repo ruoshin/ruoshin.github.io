@@ -96,6 +96,13 @@ const { class: className = "" } = Astro.props;
   .bonsai-stage {
     /* Animated by GSAP. Clockwise from viewer = decreasing value. */
     --rotation: 0deg;
+    cursor: grab;
+    /* Allow vertical page scroll on touch; horizontal swipes rotate the scene. */
+    touch-action: pan-y;
+  }
+
+  .bonsai-stage[data-bonsai-dragging] {
+    cursor: grabbing;
   }
 
   /* Pot — centered, no Z offset (sits on rotation axis). */
@@ -168,18 +175,108 @@ const { class: className = "" } = Astro.props;
     height: auto;
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .bonsai-stage { --rotation: 0deg !important; }
-  }
 </style>
 
 <script>
   import { gsap } from "gsap";
 
-  // Track tweens per stage so they can be killed before a view transition
-  // swaps the DOM out — otherwise the old tween keeps running and writing
-  // --rotation to a detached element on every locale switch.
-  const tweens = new WeakMap<HTMLElement, gsap.core.Tween>();
+  const SPIN_DURATION_SEC = 60; // seconds per full revolution
+  const DEG_PER_PX = 0.4; // horizontal drag sensitivity
+  // Threshold prevents a tap on a plant (Phase 6) from being treated as a
+  // drag; movement under this stays a click.
+  const DRAG_THRESHOLD_PX = 4;
+
+  type StageController = {
+    state: { r: number };
+    tween: gsap.core.Tween | null;
+  };
+
+  // One controller per stage element. Killed on astro:before-swap so the old
+  // tween stops writing --rotation to a detached element after a locale switch.
+  const controllers = new WeakMap<HTMLElement, StageController>();
+
+  function startAutoSpin(
+    stage: HTMLElement,
+    ctrl: StageController,
+  ): gsap.core.Tween {
+    // Each segment tweens 360deg over SPIN_DURATION_SEC, then chains the next
+    // from the current value. Avoids GSAP's repeat-reset jump and lets the
+    // spin resume seamlessly from wherever drag left state.r.
+    return gsap.to(ctrl.state, {
+      r: ctrl.state.r - 360, // negative = clockwise from viewer
+      duration: SPIN_DURATION_SEC,
+      ease: "none",
+      onUpdate: () => {
+        stage.style.setProperty("--rotation", `${ctrl.state.r}deg`);
+      },
+      onComplete: () => {
+        ctrl.tween = startAutoSpin(stage, ctrl);
+      },
+    });
+  }
+
+  // Pause auto-spin once movement crosses the threshold, resume on release.
+  // Under threshold the gesture stays a click — child orbiters can still
+  // receive normal click events (used by the upcoming experience drawer).
+  function bindPointerDrag(
+    stage: HTMLElement,
+    ctrl: StageController,
+    reduceMotion: boolean,
+  ) {
+    let pointerDown = false;
+    let dragging = false;
+    let totalDx = 0;
+    let lastX = 0;
+
+    stage.addEventListener("pointerdown", (e) => {
+      pointerDown = true;
+      dragging = false;
+      totalDx = 0;
+      lastX = e.clientX;
+      // Pointer capture is deferred until the threshold is crossed so a
+      // sub-threshold tap still dispatches `click` on the original child.
+    });
+
+    stage.addEventListener("pointermove", (e) => {
+      if (!pointerDown) return;
+      const dx = e.clientX - lastX;
+      lastX = e.clientX;
+      if (!dragging) {
+        totalDx += Math.abs(dx);
+        if (totalDx > DRAG_THRESHOLD_PX) {
+          dragging = true;
+          stage.setAttribute("data-bonsai-dragging", "");
+          stage.setPointerCapture(e.pointerId);
+          ctrl.tween?.kill();
+          ctrl.tween = null;
+        }
+      }
+      if (dragging) {
+        // Subtract so drag direction matches auto-spin: drag right →
+        // r decreases → clockwise from viewer.
+        ctrl.state.r += dx * DEG_PER_PX;
+        stage.style.setProperty("--rotation", `${ctrl.state.r}deg`);
+      }
+    });
+
+    const endPointer = (e: PointerEvent) => {
+      if (!pointerDown) return;
+      pointerDown = false;
+      if (dragging) {
+        dragging = false;
+        stage.removeAttribute("data-bonsai-dragging");
+        if (stage.hasPointerCapture(e.pointerId)) {
+          stage.releasePointerCapture(e.pointerId);
+        }
+        if (!reduceMotion) {
+          ctrl.tween = startAutoSpin(stage, ctrl);
+        }
+      }
+    };
+
+    stage.addEventListener("pointerup", endPointer);
+    stage.addEventListener("pointercancel", endPointer);
+  }
 
   function setupBonsai() {
     const stages = document.querySelectorAll<HTMLElement>(
@@ -193,19 +290,15 @@ const { class: className = "" } = Astro.props;
 
     for (const stage of stages) {
       stage.setAttribute("data-bonsai-init", "");
-      if (reduceMotion) continue;
 
-      const state = { r: 0 };
-      const tween = gsap.to(state, {
-        r: -360, // negative rotateY = clockwise from viewer's perspective
-        duration: 60,
-        repeat: -1,
-        ease: "none",
-        onUpdate: () => {
-          stage.style.setProperty("--rotation", `${state.r}deg`);
-        },
-      });
-      tweens.set(stage, tween);
+      const ctrl: StageController = { state: { r: 0 }, tween: null };
+      controllers.set(stage, ctrl);
+
+      if (!reduceMotion) {
+        ctrl.tween = startAutoSpin(stage, ctrl);
+      }
+
+      bindPointerDrag(stage, ctrl, reduceMotion);
     }
   }
 
@@ -213,8 +306,9 @@ const { class: className = "" } = Astro.props;
     document
       .querySelectorAll<HTMLElement>("[data-bonsai-rotator][data-bonsai-init]")
       .forEach((stage) => {
-        tweens.get(stage)?.kill();
-        tweens.delete(stage);
+        const ctrl = controllers.get(stage);
+        ctrl?.tween?.kill();
+        controllers.delete(stage);
       });
   }
 
