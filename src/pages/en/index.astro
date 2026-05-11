@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import Header from "@/components/Header.astro";
+import Sidebar from "@/components/Sidebar.astro";
 import Footer from "@/components/Footer.astro";
 import Hero from "@/components/Hero.astro";
 import About from "@/components/About.astro";
@@ -12,7 +13,8 @@ import Contact from "@/components/Contact.astro";
 
 <BaseLayout>
   <Header />
-  <main>
+  <Sidebar />
+  <main class="xl:pl-sidebar">
     <Hero />
     <div class="border-t border-[var(--color-border)]"></div>
     <About />

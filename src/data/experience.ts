@@ -1,18 +1,23 @@
 import { type Localized, tx } from "@/lib/i18n";
 
 export type Experience = {
+  id: string;
   company: string;
+  shortName?: Localized;
   href?: string;
   role: Localized;
   period: string;
   summary: Localized;
   highlights: Localized[];
   stack: string[];
+  /** Hide this entry from the sidebar index (still shown in the Experience section). */
+  sidebarHidden?: boolean;
 };
 
 export const experience: Experience[] = [
   {
-    company: "Actuaviz",
+    id: "actuaViz",
+    company: "ActuaViz",
     href: "https://www.actuaviz.com",
     role: tx("資深前端工程師", "Senior Front-end Developer"),
     period: "2021.10 — Present",
@@ -53,7 +58,9 @@ export const experience: Experience[] = [
     stack: ["React", "TypeScript", "Office.js", "Tailwind CSS", "Jest", "Playwright", "Figma"],
   },
   {
+    id: "vocus",
     company: "新銳數位 / vocus.cc",
+    shortName: tx("vocus.cc", "vocus.cc"),
     href: "https://vocus.cc",
     role: tx("前端工程師", "Front-end Developer"),
     period: "2019.11 — 2020.11",
@@ -78,7 +85,9 @@ export const experience: Experience[] = [
     stack: ["React", "Next.js", "Storybook", "SCSS"],
   },
   {
+    id: "infocast",
     company: "Infocast / Nucleus",
+    shortName: tx("Infocast", "Infocast"),
     href: "https://lihsunco.com/",
     role: tx("前端工程師", "Front-end Developer"),
     period: "2015.6 — 2019.6",
@@ -107,7 +116,9 @@ export const experience: Experience[] = [
     stack: ["React", "Storybook", "JavaScript"],
   },
   {
+    id: "pace",
     company: "北士設計 PACE Design",
+    shortName: tx("PACE Design", "PACE Design"),
     href: "https://pace.com.tw",
     role: tx("前端設計師", "Front-end Designer"),
     period: "2015.1 — 2015.6",
@@ -128,8 +139,10 @@ export const experience: Experience[] = [
       tx("與客戶開會直接討論需求", "Met directly with clients to gather and clarify requirements."),
     ],
     stack: ["jQuery", "Bootstrap", "LESS", "RWD"],
+    sidebarHidden: true,
   },
   {
+    id: "toujia",
     company: "台灣頭家",
     role: tx("後端工程師", "PHP Developer"),
     period: "2014.7 — 2014.12",
@@ -139,5 +152,6 @@ export const experience: Experience[] = [
     ),
     highlights: [],
     stack: ["PHP"],
+    sidebarHidden: true,
   },
 ];

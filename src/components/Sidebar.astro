@@ -1,0 +1,154 @@
+---
+import { experience } from "@/data/experience";
+import { getLocale, localePath, ui } from "@/lib/i18n";
+
+const locale = getLocale(Astro.currentLocale);
+const home = localePath(locale);
+
+const sections = [
+  { id: "about", label: ui.navAbout[locale] },
+  { id: "experience", label: ui.navExperience[locale] },
+  { id: "projects", label: ui.navProjects[locale] },
+  { id: "skills", label: ui.navSkills[locale] },
+  { id: "contact", label: ui.navContact[locale] },
+];
+
+const expSubs = experience
+  .filter((job) => !job.sidebarHidden)
+  .map((job) => ({
+    id: job.id,
+    label: job.shortName ? job.shortName[locale] : job.company,
+  }));
+---
+
+<aside
+  class="sidebar hidden xl:block fixed left-8 top-24 w-[220px] z-20"
+  aria-label="Section index"
+>
+  <div
+    class="rounded-xl border border-[var(--color-border)] bg-[var(--color-subtle)]/50 backdrop-blur-sm px-4 py-5"
+  >
+    <div class="sidebar-eyebrow">Index</div>
+
+    <nav class="mt-3">
+      <ol>
+        {
+          sections.map((s, i) => (
+            <li>
+              <a href={`${home}#${s.id}`} class="sidebar-link sidebar-main">
+                <span class="sidebar-num">{String(i + 1).padStart(2, "0")}</span>
+                <span class="sidebar-label">{s.label}</span>
+              </a>
+              {s.id === "experience" && (
+                <ol class="sidebar-subs">
+                  {expSubs.map((sub) => (
+                    <li>
+                      <a
+                        href={`${home}#exp-${sub.id}`}
+                        class="sidebar-link sidebar-sub"
+                      >
+                        <span class="sidebar-label">{sub.label}</span>
+                      </a>
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </li>
+          ))
+        }
+      </ol>
+    </nav>
+  </div>
+</aside>
+
+<style>
+  .sidebar-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    padding-bottom: 8px;
+    border-bottom: 1px dashed var(--color-border);
+  }
+
+  nav ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .sidebar-link {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 6px 8px;
+    color: var(--color-muted);
+    border-radius: 6px;
+    transition:
+      color 0.15s ease,
+      background-color 0.15s ease;
+  }
+
+  .sidebar-num {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--color-border);
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+  }
+
+  .sidebar-main {
+    font-size: 14px;
+  }
+  .sidebar-main .sidebar-label {
+    font-weight: 500;
+  }
+
+  .sidebar-sub {
+    padding-left: 30px;
+    font-size: 12px;
+  }
+
+  .sidebar-subs {
+    position: relative;
+    margin: 2px 0 4px;
+  }
+  .sidebar-subs::before {
+    content: "";
+    position: absolute;
+    left: 24px;
+    top: 2px;
+    bottom: 6px;
+    border-left: 1px dashed var(--color-border);
+    pointer-events: none;
+  }
+
+  .sidebar-link:hover {
+    color: var(--color-fg);
+    background-color: color-mix(
+      in oklch,
+      var(--color-accent) 8%,
+      transparent
+    );
+  }
+  .sidebar-link:hover .sidebar-num {
+    color: var(--color-accent);
+  }
+
+  /* Active state — driven by IntersectionObserver in BaseLayout */
+  .sidebar-link[data-active] {
+    color: var(--color-accent);
+    background-color: color-mix(
+      in oklch,
+      var(--color-accent) 12%,
+      transparent
+    );
+  }
+  .sidebar-link[data-active] .sidebar-num {
+    color: var(--color-accent);
+  }
+  .sidebar-link[data-active] .sidebar-label {
+    font-weight: 600;
+  }
+</style>

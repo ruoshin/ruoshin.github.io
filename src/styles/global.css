@@ -7,8 +7,11 @@
     "PingFang TC", "Microsoft JhengHei", sans-serif;
   --font-serif: "Fraunces", "Noto Serif TC", "Source Han Serif TC", "Songti TC",
     "STSong", serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco,
+  --font-mono: "Space Mono", ui-monospace, SFMono-Regular, Menlo, Monaco,
     Consolas, monospace;
+
+  /* Sidebar offset = left:8px + width:220px + gutter:~44px (xl+ only) */
+  --spacing-sidebar: 17rem;
 
   /* Warm cream background, royal-blue ink, orange accent */
   --color-bg: oklch(0.97 0.022 80);

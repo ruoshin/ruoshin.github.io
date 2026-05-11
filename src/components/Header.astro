@@ -2,25 +2,17 @@
 import ThemeToggle from "./ThemeToggle.astro";
 import LanguageToggle from "./LanguageToggle.astro";
 import { profile } from "@/data/profile";
-import { getLocale, localePath, ui } from "@/lib/i18n";
+import { getLocale, localePath } from "@/lib/i18n";
 
 const locale = getLocale(Astro.currentLocale);
 const home = localePath(locale);
-
-const nav = [
-  { label: ui.navAbout[locale], href: `${home}#about` },
-  { label: ui.navExperience[locale], href: `${home}#experience` },
-  { label: ui.navProjects[locale], href: `${home}#projects` },
-  { label: ui.navSkills[locale], href: `${home}#skills` },
-  { label: ui.navContact[locale], href: `${home}#contact` },
-];
 ---
 
 <header
   class="sticky top-0 z-30 backdrop-blur-md bg-[var(--color-bg)]/80 border-b border-[var(--color-border)]"
 >
   <div
-    class="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between gap-6"
+    class="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between gap-6 xl:max-w-none xl:pl-sidebar"
   >
     <a
       href={`${home}#top`}
@@ -28,20 +20,6 @@ const nav = [
     >
       {profile.name.toLowerCase().replace(" ", ".")}
     </a>
-    <nav
-      class="hidden md:flex items-center gap-6 text-sm text-[var(--color-muted)]"
-    >
-      {
-        nav.map((item) => (
-          <a
-            href={item.href}
-            class="hover:text-[var(--color-fg)] transition-colors"
-          >
-            {item.label}
-          </a>
-        ))
-      }
-    </nav>
     <div class="flex items-center gap-2">
       <LanguageToggle />
       <ThemeToggle />
