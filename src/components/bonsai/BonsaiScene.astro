@@ -1,9 +1,12 @@
 ---
 import Pot from "./Pot.astro";
 import Tree from "./Tree.astro";
-import Branch from "./Branch.astro";
+import Plant from "./Plant.astro";
 import Kinoko from "./Kinoko.astro";
-import { bonsaiBranches, bonsaiDecorations } from "@/data/bonsai-mapping";
+import Flower from "./Flower.astro";
+import { bonsaiPlants, bonsaiDecorations } from "@/data/bonsai-mapping";
+
+const decorationGlyphs = { kinoko: Kinoko, flower: Flower } as const;
 
 interface Props {
   class?: string;
@@ -33,29 +36,33 @@ const { class: className = "" } = Astro.props;
       <Tree class="block w-full" />
     </div>
 
-    <!-- Branches (experience-linked) scattered in inner and outer rings. -->
+    <!-- Plants (experience-linked) scattered in inner and outer rings. -->
     {
-      bonsaiBranches.map((b) => (
+      bonsaiPlants.map((p) => (
         <div
-          class="bonsai-orbiter bonsai-branch"
-          data-experience-id={b.experienceId}
-          style={`color: var(--bonsai-${b.color}); --theta: ${b.angle}deg; --r: ${b.radius}px; --tilt: ${b.tilt}deg; --scale: ${b.scale};`}
+          class="bonsai-orbiter bonsai-plant"
+          data-experience-id={p.experienceId}
+          style={`color: var(--bonsai-${p.color}); --theta: ${p.angle}deg; --r: ${p.radius}px; --tilt: ${p.tilt}deg; --scale: ${p.scale};`}
         >
-          <Branch class="block w-full" />
+          <Plant class="block w-full" />
         </div>
       ))
     }
 
-    <!-- Decorative mushrooms — same orbit transform, smaller footprint. -->
+    <!-- Decorative orbiters (mushrooms, flowers, ...) — same orbit transform,
+         smaller footprint than branches. Glyph dispatched by `kind`. -->
     {
-      bonsaiDecorations.map((d) => (
-        <div
-          class="bonsai-orbiter bonsai-kinoko"
-          style={`color: var(--bonsai-${d.color}); --theta: ${d.angle}deg; --r: ${d.radius}px; --tilt: ${d.tilt}deg; --scale: ${d.scale};`}
-        >
-          <Kinoko class="block w-full" />
-        </div>
-      ))
+      bonsaiDecorations.map((d) => {
+        const Glyph = decorationGlyphs[d.kind];
+        return (
+          <div
+            class={`bonsai-orbiter bonsai-${d.kind}`}
+            style={`color: var(--bonsai-${d.color}); --theta: ${d.angle}deg; --r: ${d.radius}px; --tilt: ${d.tilt}deg; --scale: ${d.scale};`}
+          >
+            <Glyph class="block w-full" />
+          </div>
+        );
+      })
     }
   </div>
 </div>
@@ -150,8 +157,9 @@ const { class: className = "" } = Astro.props;
     will-change: transform;
   }
 
-  .bonsai-branch { width: 11%; }
+  .bonsai-plant { width: 6%; }
   .bonsai-kinoko { width: 8%; }
+  .bonsai-flower { width: 5%; }
 
   .bonsai-tree svg,
   .bonsai-orbiter svg {
