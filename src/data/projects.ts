@@ -18,6 +18,9 @@ export type ProjectImage = {
 
 export type Project = {
   id: string;
+  /** Links this project to an entry in experience.ts so it can appear in
+   *  that role's bonsai popup. */
+  experienceId?: string;
   name: string;
   client?: Localized;
   summary?: Localized;
@@ -29,6 +32,7 @@ export type Project = {
 export const projects: Project[] = [
   {
     id: "vocus",
+    experienceId: "vocus",
     name: "vocus.cc",
     client: tx("新銳數位 / 內容平台", "Vocus / Content platform"),
     summary: tx(
@@ -44,6 +48,7 @@ export const projects: Project[] = [
   },
   {
     id: "nucleus",
+    experienceId: "infocast",
     name: "Nucleus",
     client: tx("Infocast / 社群輿情分析平台", "Infocast / Social listening platform"),
     summary: tx(

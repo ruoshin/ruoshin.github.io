@@ -4,7 +4,11 @@ import Tree from "./Tree.astro";
 import Plant from "./Plant.astro";
 import Kinoko from "./Kinoko.astro";
 import Flower from "./Flower.astro";
-import { bonsaiPlants, bonsaiDecorations } from "@/data/bonsai-mapping";
+import {
+  bonsaiPlants,
+  bonsaiDecorations,
+  bonsaiTreeExperienceId,
+} from "@/data/bonsai-mapping";
 import { experience } from "@/data/experience";
 import { getLocale } from "@/lib/i18n";
 
@@ -16,6 +20,16 @@ interface Props {
 const { class: className = "" } = Astro.props;
 const locale = getLocale(Astro.currentLocale);
 const experienceById = new Map(experience.map((e) => [e.id, e]));
+
+const treeJob = experienceById.get(bonsaiTreeExperienceId);
+if (!treeJob) {
+  throw new Error(
+    `bonsai-mapping: unknown tree experienceId "${bonsaiTreeExperienceId}"`,
+  );
+}
+const treeRole = treeJob.role[locale];
+const treeCompany = treeJob.shortName?.[locale] ?? treeJob.company;
+const treeLabel = `${treeRole} · ${treeCompany}`;
 ---
 
 <div class={`bonsai-perspective ${className}`}>
@@ -60,14 +74,28 @@ const experienceById = new Map(experience.map((e) => [e.id, e]));
   </svg>
 
   <div class="bonsai-stage" data-bonsai-rotator>
-    <!-- Central tree, billboarded, no orbit. -->
-    <div class="bonsai-tree">
+    <!-- Central tree, billboarded, no orbit. Doubles as the button for the
+         "main" experience (bonsaiTreeExperienceId) — same click contract as
+         the plant orbiters via [data-experience-id]. -->
+    <div
+      class="bonsai-tree"
+      data-experience-id={bonsaiTreeExperienceId}
+      role="button"
+      tabindex="0"
+      aria-label={treeLabel}
+    >
       <Tree class="block w-full" />
+      <span class="bonsai-label bonsai-tree-label" aria-hidden="true">
+        <span>{treeRole}</span>
+        <span class="bonsai-label-sep">·</span>
+        <span class="bonsai-label-company">{treeCompany}</span>
+      </span>
     </div>
 
     <!-- Plants (experience-linked) scattered in inner and outer rings.
          Each plant doubles as a button: hover/focus reveals a tooltip
-         (role · company), click/Enter scrolls to that experience entry. -->
+         (role · company), click/Enter opens that experience's popup via
+         the `experience:open` event (see ExperiencePopup.astro). -->
     {
       bonsaiPlants.map((p) => {
         const job = experienceById.get(p.experienceId);
@@ -89,10 +117,10 @@ const experienceById = new Map(experience.map((e) => [e.id, e]));
             style={`color: var(--bonsai-${p.color}); --theta: ${p.angle}deg; --r: ${p.radius}px; --tilt: ${p.tilt}deg; --scale: ${p.scale};`}
           >
             <Plant class="block w-full" />
-            <span class="bonsai-plant-label" aria-hidden="true">
+            <span class="bonsai-label bonsai-plant-label" aria-hidden="true">
               <span>{role}</span>
-              <span class="bonsai-plant-label-sep">·</span>
-              <span class="bonsai-plant-label-company">{company}</span>
+              <span class="bonsai-label-sep">·</span>
+              <span class="bonsai-label-company">{company}</span>
             </span>
           </div>
         );
@@ -211,7 +239,9 @@ const experienceById = new Map(experience.map((e) => [e.id, e]));
     stroke-width: 30;
   }
 
-  /* Tree — centered, billboarded at orbit center. No orbit transform applied. */
+  /* Tree — centered, billboarded at orbit center. No orbit transform applied.
+     Also acts as a button for the "main" experience; cursor and focus styling
+     mirror .bonsai-plant. */
   .bonsai-tree {
     position: absolute;
     left: 50%;
@@ -219,6 +249,13 @@ const experienceById = new Map(experience.map((e) => [e.id, e]));
     width: 32%;
     transform: translate3d(-50%, 0, 0);
     color: var(--bonsai-leaf);
+    cursor: pointer;
+    outline: none;
+  }
+  .bonsai-tree:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 6px;
+    border-radius: 6px;
   }
 
   /* Orbiters — branches and decorations both orbit the central tree using
@@ -269,12 +306,10 @@ const experienceById = new Map(experience.map((e) => [e.id, e]));
     border-radius: 4px;
   }
 
-  /* Tooltip above the plant. The orbiter applies rotate(tilt) then scale(s)
-     last in its transform chain, so cancelling those two leaves the label
-     billboarded, upright, and at a constant readable size across plants.
-     transform-origin: 50% 100% pins the bottom-center to the plant top so
-     the scale grows the label upward, away from the silhouette. */
-  .bonsai-plant-label {
+  /* Shared label pill — used by both plants and the tree as a hover/focus
+     tooltip. Per-variant transform overrides live in .bonsai-plant-label /
+     .bonsai-tree-label below. */
+  .bonsai-label {
     position: absolute;
     bottom: calc(100% + 6px);
     left: 50%;
@@ -292,27 +327,44 @@ const experienceById = new Map(experience.map((e) => [e.id, e]));
     box-shadow: 0 6px 16px -10px rgb(0 0 0 / 0.35);
     opacity: 0;
     pointer-events: none;
+    transform: translateX(-50%);
+    transition: opacity 180ms ease;
+    z-index: 2;
+  }
+  .bonsai-label-sep,
+  .bonsai-label-company {
+    color: var(--color-muted);
+  }
+
+  /* Plant variant — the orbiter applies rotate(tilt) then scale(s) last in
+     its transform chain, so cancelling those two leaves the label billboarded,
+     upright, and at a constant readable size across plants. transform-origin
+     pins the bottom-center to the plant top so scale grows the label upward,
+     away from the silhouette. */
+  .bonsai-plant-label {
     transform:
       translateX(-50%)
       rotate(calc(-1 * var(--tilt, 0deg)))
       scale(calc(1 / var(--scale, 1)));
     transform-origin: 50% 100%;
-    transition: opacity 180ms ease;
-    z-index: 2;
   }
-  .bonsai-plant-label-sep,
-  .bonsai-plant-label-company {
-    color: var(--color-muted);
+
+  /* Tree variant — no transform-cancel needed (the tree doesn't tilt/scale);
+     sits slightly higher to clear the foliage. */
+  .bonsai-tree-label {
+    bottom: calc(100% + 8px);
   }
 
   /* Hover-driven reveal is gated to pointer-capable devices so iOS doesn't
      leave the label stuck on after a tap. Keyboard focus always reveals. */
   @media (hover: hover) {
-    .bonsai-plant:hover .bonsai-plant-label {
+    .bonsai-plant:hover .bonsai-label,
+    .bonsai-tree:hover .bonsai-label {
       opacity: 1;
     }
   }
-  .bonsai-plant:focus-visible .bonsai-plant-label {
+  .bonsai-plant:focus-visible .bonsai-label,
+  .bonsai-tree:focus-visible .bonsai-label {
     opacity: 1;
   }
 

@@ -34,12 +34,16 @@ export type BonsaiPlant = {
 // at 6% of 640, kinoko ~26px at 8%, flower ~16px at 5%, scaled by
 // `scale`) is rarely binding.
 export const bonsaiPlants: BonsaiPlant[] = [
-  { experienceId: "actuaViz", angle: 15, radius: 124, scale: 1.05, tilt: -8, color: "terra" },
   { experienceId: "vocus", angle: 95, radius: 73, scale: 0.85, tilt: 6, color: "teal" },
   { experienceId: "infocast", angle: 170, radius: 135, scale: 1.0, tilt: -5, color: "mustard" },
   { experienceId: "toujia", angle: 235, radius: 96, scale: 0.9, tilt: 10, color: "lavender" },
   { experienceId: "pace", angle: 310, radius: 130, scale: 0.95, tilt: -12, color: "rose" },
 ];
+
+/** The central tree represents the "main" experience — typically the most
+ *  recent role. Clicking the tree opens that experience's popup just like
+ *  the orbiting plants do. */
+export const bonsaiTreeExperienceId = "actuaViz";
 
 /** Decorative orbiters — no experience linkage, just visual fill. */
 export type BonsaiDecorationKind = "kinoko" | "flower";

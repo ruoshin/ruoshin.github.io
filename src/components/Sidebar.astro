@@ -1,5 +1,4 @@
 ---
-import { experience } from "@/data/experience";
 import { getLocale, localePath, ui } from "@/lib/i18n";
 
 const locale = getLocale(Astro.currentLocale);
@@ -7,18 +6,9 @@ const home = localePath(locale);
 
 const sections = [
   { id: "about", label: ui.navAbout[locale] },
-  { id: "experience", label: ui.navExperience[locale] },
-  { id: "projects", label: ui.navProjects[locale] },
   { id: "skills", label: ui.navSkills[locale] },
   { id: "contact", label: ui.navContact[locale] },
 ];
-
-const expSubs = experience
-  .filter((job) => !job.sidebarHidden)
-  .map((job) => ({
-    id: job.id,
-    label: job.shortName ? job.shortName[locale] : job.company,
-  }));
 ---
 
 <aside
@@ -39,20 +29,6 @@ const expSubs = experience
                 <span class="sidebar-num">{String(i + 1).padStart(2, "0")}</span>
                 <span class="sidebar-label">{s.label}</span>
               </a>
-              {s.id === "experience" && (
-                <ol class="sidebar-subs">
-                  {expSubs.map((sub) => (
-                    <li>
-                      <a
-                        href={`${home}#exp-${sub.id}`}
-                        class="sidebar-link sidebar-sub"
-                      >
-                        <span class="sidebar-label">{sub.label}</span>
-                      </a>
-                    </li>
-                  ))}
-                </ol>
-              )}
             </li>
           ))
         }
@@ -103,25 +79,6 @@ const expSubs = experience
   }
   .sidebar-main .sidebar-label {
     font-weight: 500;
-  }
-
-  .sidebar-sub {
-    padding-left: 30px;
-    font-size: 12px;
-  }
-
-  .sidebar-subs {
-    position: relative;
-    margin: 2px 0 4px;
-  }
-  .sidebar-subs::before {
-    content: "";
-    position: absolute;
-    left: 24px;
-    top: 2px;
-    bottom: 6px;
-    border-left: 1px dashed var(--color-border);
-    pointer-events: none;
   }
 
   .sidebar-link:hover {

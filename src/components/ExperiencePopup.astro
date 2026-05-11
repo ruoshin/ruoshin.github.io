@@ -1,0 +1,446 @@
+---
+import ExternalLink from "./ExternalLink.astro";
+import ProjectThumbnail from "./ProjectThumbnail.astro";
+import { experience } from "@/data/experience";
+import { projects } from "@/data/projects";
+import { getLocale, ui } from "@/lib/i18n";
+
+const locale = getLocale(Astro.currentLocale);
+
+// Group projects by their owning experience entry so each panel can render
+// its own related-projects block inline. Experiences with no projects just
+// skip that block.
+const projectsByExperience = new Map<string, typeof projects>();
+for (const project of projects) {
+  if (!project.experienceId) continue;
+  const list = projectsByExperience.get(project.experienceId) ?? [];
+  list.push(project);
+  projectsByExperience.set(project.experienceId, list);
+}
+---
+
+<dialog
+  id="bonsai-experience-modal"
+  class="bonsai-modal"
+  aria-label={ui.experienceLabel[locale]}
+>
+  <div class="bonsai-modal-card">
+    <button
+      type="button"
+      class="bonsai-modal-close"
+      data-modal-close
+      aria-label={ui.modalClose[locale]}
+    >
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+        <path
+          d="M6 6 L18 18 M6 18 L18 6"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          fill="none"
+        />
+      </svg>
+    </button>
+
+    <div class="bonsai-modal-body">
+      {
+        experience.map((job) => {
+          const related = projectsByExperience.get(job.id) ?? [];
+          const role = job.role[locale];
+          const titleId = `bonsai-modal-title-${job.id}`;
+          return (
+            <article
+              class="bonsai-modal-panel"
+              data-experience-panel={job.id}
+              aria-labelledby={titleId}
+              hidden
+            >
+              <header class="bonsai-modal-header">
+                <p class="bonsai-modal-eyebrow">{ui.experienceLabel[locale]}</p>
+                <h2 id={titleId} class="bonsai-modal-title font-display">
+                  <span>{role}</span>
+                  <span class="bonsai-modal-title-sep"> · </span>
+                  {job.href ? (
+                    <ExternalLink href={job.href} class="bonsai-modal-company">
+                      {job.company}
+                    </ExternalLink>
+                  ) : (
+                    <span class="bonsai-modal-company">{job.company}</span>
+                  )}
+                </h2>
+                <p class="bonsai-modal-period">{job.period}</p>
+              </header>
+
+              <p class="bonsai-modal-summary">{job.summary[locale]}</p>
+
+              {job.highlights.length > 0 && (
+                <ul class="bonsai-modal-highlights">
+                  {job.highlights.map((h) => (
+                    <li>
+                      <span class="bonsai-modal-bullet" aria-hidden="true" />
+                      <span>{h[locale]}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              {job.stack.length > 0 && (
+                <ul class="bonsai-modal-stack">
+                  {job.stack.map((tech) => (
+                    <li>{tech}</li>
+                  ))}
+                </ul>
+              )}
+
+              {related.length > 0 && (
+                <section class="bonsai-modal-related">
+                  <h3 class="bonsai-modal-related-title">
+                    {ui.modalRelatedProjects[locale]}
+                  </h3>
+                  <div class="bonsai-modal-related-list">
+                    {related.map((project) => (
+                      <div class="bonsai-modal-project">
+                        <header>
+                          <h4 class="bonsai-modal-project-name">
+                            {project.href ? (
+                              <ExternalLink
+                                href={project.href}
+                                class="bonsai-modal-project-link"
+                              >
+                                {project.name}
+                                <span class="bonsai-modal-project-arrow"> ↗</span>
+                              </ExternalLink>
+                            ) : (
+                              <span>{project.name}</span>
+                            )}
+                            {project.client && (
+                              <span class="bonsai-modal-project-client">
+                                {" "}
+                                · {project.client[locale]}
+                              </span>
+                            )}
+                          </h4>
+                          {project.summary && (
+                            <p class="bonsai-modal-project-summary">
+                              {project.summary[locale]}
+                            </p>
+                          )}
+                        </header>
+                        <ul class="bonsai-modal-project-grid">
+                          {project.images.map((img) => (
+                            <ProjectThumbnail img={img} locale={locale} />
+                          ))}
+                        </ul>
+                        {project.stack && project.stack.length > 0 && (
+                          <ul class="bonsai-modal-project-stack">
+                            {project.stack.map((tech) => (
+                              <li>{tech}</li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+            </article>
+          );
+        })
+      }
+    </div>
+  </div>
+</dialog>
+
+<style>
+  /* Native <dialog> reset: strip the UA chrome so the inner card owns the
+     visual. Padding stays at 0 so a click anywhere outside .bonsai-modal-card
+     hits the dialog itself (used by the backdrop-click-to-close handler). */
+  .bonsai-modal {
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--color-fg);
+    width: 100%;
+    max-width: min(900px, calc(100vw - 2rem));
+    max-height: calc(100vh - 2rem);
+    border-radius: 18px;
+    overflow: visible;
+  }
+  .bonsai-modal::backdrop {
+    background: rgb(0 0 0 / 0.5);
+    backdrop-filter: blur(2px);
+  }
+
+  .bonsai-modal-card {
+    position: relative;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 18px;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+    padding: 2rem 1.75rem 2.5rem;
+    box-shadow: 0 30px 60px -25px rgb(0 0 0 / 0.4);
+  }
+
+  .bonsai-modal-close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg);
+    color: var(--color-fg);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease,
+      border-color 0.15s ease;
+  }
+  .bonsai-modal-close:hover,
+  .bonsai-modal-close:focus-visible {
+    background: var(--color-accent);
+    color: var(--color-bg);
+    border-color: var(--color-accent);
+    outline: none;
+  }
+
+  /* Panels are mutually exclusive — only the one matching the selected
+     experience stays visible. JS toggles the `hidden` attribute, which
+     already implies display:none, so no extra rule needed. */
+
+  .bonsai-modal-header {
+    padding-right: 2.5rem; /* leave space for close button */
+  }
+
+  .bonsai-modal-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+  .bonsai-modal-title {
+    margin-top: 0.4rem;
+    font-size: clamp(1.5rem, 3.6vw, 1.875rem);
+    font-weight: 600;
+    line-height: 1.2;
+  }
+  .bonsai-modal-title-sep,
+  .bonsai-modal-company {
+    color: var(--color-muted);
+    font-weight: 400;
+  }
+  .bonsai-modal-company {
+    transition: color 0.15s ease;
+  }
+  a.bonsai-modal-company:hover {
+    color: var(--color-accent);
+  }
+  .bonsai-modal-period {
+    margin-top: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .bonsai-modal-summary {
+    margin-top: 1.25rem;
+    color: color-mix(in oklch, var(--color-fg) 85%, transparent);
+    line-height: 1.65;
+  }
+
+  .bonsai-modal-highlights {
+    margin-top: 1.1rem;
+    display: grid;
+    gap: 0.55rem;
+    font-size: 0.95rem;
+    color: color-mix(in oklch, var(--color-fg) 85%, transparent);
+  }
+  .bonsai-modal-highlights li {
+    display: flex;
+    gap: 0.5rem;
+    line-height: 1.6;
+  }
+  .bonsai-modal-bullet {
+    width: 0.3rem;
+    height: 0.3rem;
+    margin-top: 0.7rem;
+    border-radius: 999px;
+    background: var(--color-accent);
+    flex-shrink: 0;
+  }
+
+  .bonsai-modal-stack,
+  .bonsai-modal-project-stack {
+    margin-top: 1.2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .bonsai-modal-stack li,
+  .bonsai-modal-project-stack li {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-border);
+    color: var(--color-muted);
+  }
+
+  .bonsai-modal-related {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px dashed var(--color-border);
+  }
+  .bonsai-modal-related-title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+  .bonsai-modal-related-list {
+    margin-top: 1.1rem;
+    display: grid;
+    gap: 2rem;
+  }
+  .bonsai-modal-project-name {
+    font-size: 1.05rem;
+    font-weight: 600;
+  }
+  .bonsai-modal-project-link {
+    transition: color 0.15s ease;
+  }
+  .bonsai-modal-project-link:hover {
+    color: var(--color-accent);
+  }
+  .bonsai-modal-project-arrow {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    color: var(--color-muted);
+  }
+  .bonsai-modal-project-client {
+    color: var(--color-muted);
+    font-weight: 400;
+  }
+  .bonsai-modal-project-summary {
+    margin-top: 0.4rem;
+    color: color-mix(in oklch, var(--color-fg) 85%, transparent);
+    line-height: 1.6;
+  }
+  .bonsai-modal-project-grid {
+    margin-top: 0.85rem;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.65rem;
+  }
+  @media (min-width: 640px) {
+    .bonsai-modal-project-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes bonsai-modal-in {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+    .bonsai-modal[open] {
+      animation: bonsai-modal-in 200ms ease-out;
+    }
+  }
+</style>
+
+<script>
+  // Single, idempotent setup. Bound flag prevents duplicate listeners after
+  // an Astro view transition swap (which we tear down in `astro:before-swap`
+  // anyway — belt and braces).
+  function setupExperienceModal() {
+    const el = document.querySelector<HTMLDialogElement>(
+      "#bonsai-experience-modal",
+    );
+    if (!el || el.dataset.bound === "true") return;
+    el.dataset.bound = "true";
+
+    // Locked-narrowing alias so nested closures don't lose the non-null type
+    // (TS can't always carry narrowing across deferred-call closures).
+    const dialog: HTMLDialogElement = el;
+
+    const panels = dialog.querySelectorAll<HTMLElement>(
+      "[data-experience-panel]",
+    );
+    const card = dialog.querySelector<HTMLElement>(".bonsai-modal-card");
+
+    const open = (id: string) => {
+      const target = dialog.querySelector<HTMLElement>(
+        `[data-experience-panel="${CSS.escape(id)}"]`,
+      );
+      if (!target) return;
+      for (const panel of panels) panel.hidden = panel !== target;
+      if (!dialog.open) dialog.showModal();
+      // Reset scroll position so the panel always opens at the top — without
+      // this, switching to a longer panel after viewing a short one would
+      // leave the user mid-content.
+      card?.scrollTo({ top: 0 });
+    };
+
+    const close = () => {
+      if (dialog.open) dialog.close();
+    };
+
+    document.addEventListener("experience:open", (e) => {
+      const id = (e as CustomEvent<{ id?: string }>).detail?.id;
+      if (id) open(id);
+    });
+
+    // Backdrop click closes. Native <dialog> bubbles backdrop clicks with
+    // `event.target === dialog`; clicks inside `.bonsai-modal-card` have
+    // their target deeper in the tree and are ignored here.
+    dialog.addEventListener("click", (e) => {
+      if (e.target === dialog) close();
+    });
+
+    dialog
+      .querySelector<HTMLButtonElement>("[data-modal-close]")
+      ?.addEventListener("click", close);
+
+    // CTA buttons elsewhere on the page (e.g. the hero "View experience"
+    // button) dispatch the same `experience:open` event the bonsai plants do.
+    // Wiring them here keeps the entire open-popup contract colocated.
+    document
+      .querySelectorAll<HTMLElement>(
+        "[data-open-experience]:not([data-bound])",
+      )
+      .forEach((cta) => {
+        cta.dataset.bound = "true";
+        cta.addEventListener("click", () => {
+          const id = cta.dataset.openExperience;
+          if (!id) return;
+          document.dispatchEvent(
+            new CustomEvent("experience:open", { detail: { id } }),
+          );
+        });
+      });
+  }
+
+  function teardownExperienceModal() {
+    document
+      .querySelector<HTMLDialogElement>("#bonsai-experience-modal")
+      ?.close();
+  }
+
+  document.addEventListener("astro:page-load", setupExperienceModal);
+  document.addEventListener("astro:before-swap", teardownExperienceModal);
+</script>
