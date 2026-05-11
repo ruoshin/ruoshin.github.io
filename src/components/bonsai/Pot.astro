@@ -6,15 +6,17 @@ const { class: className = "" } = Astro.props;
 ---
 
 <svg
-  viewBox="0 0 280 150"
+  viewBox="0 0 320 140"
   xmlns="http://www.w3.org/2000/svg"
   class={className}
   aria-hidden="true"
 >
-  <!-- rim as horizontal ellipse — rx/ry ratio matches the stage's ±20° tilt
-       (ry/rx ≈ sin(20°) = 0.34) so it shares aspect with the soil disc.
-       If BonsaiScene's stage tilt changes, update ry accordingly. -->
-  <ellipse cx="140" cy="46" rx="135" ry="46" fill="currentColor" />
-  <!-- body trapezoid extending below the rim -->
-  <path d="M 35 46 L 245 46 L 225 138 L 55 138 Z" fill="currentColor" />
+  <!-- Body trapezoid only. The pot's visible "rim" lives on the flat
+       soil ellipse in BonsaiScene.astro (SVG inner stroke gives a
+       uniform-thickness band that a tilted disc with a CSS border
+       can't produce). Body's top tucks under the soil ellipse; the
+       body extends past the bonsai-perspective container via the pot
+       wrapper's negative `bottom`, so the visible base reads tall
+       rather than cropped at the container edge. -->
+  <path d="M 20 0 L 300 0 L 275 140 L 45 140 Z" fill="currentColor" />
 </svg>

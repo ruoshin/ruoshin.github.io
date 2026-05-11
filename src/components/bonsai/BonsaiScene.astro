@@ -19,20 +19,45 @@ const experienceById = new Map(experience.map((e) => [e.id, e]));
 ---
 
 <div class={`bonsai-perspective ${className}`}>
-  <!-- Three independent preserve-3d contexts sharing the same tilt.
-       DOM order = paint order (since cross-context elements don't 3D z-sort):
-         1. Pot (back) — body + rim, behind soil
-         2. Soil (mid) — covers pot's rim interior, visible green ellipse
-         3. Stage (front) — tree + orbiting branches + kinokos always on top -->
+  <!-- Three layers in DOM = paint order. The middle one is flat 2D
+       (unlike the 3D contexts above and below it) so the rim can be an
+       SVG inner stroke — uniform-width all the way around, which a
+       3D-tilted disc with a CSS border can't produce.
+         1. Pot (back, 3D, -20° tilt) — body trapezoid only
+         2. Soil + rim (mid, 2D screen plane)
+         3. Stage (front, 3D, -20° tilt) — tree + orbiters always on top -->
   <div class="bonsai-back-context">
     <div class="bonsai-pot">
       <Pot class="block w-full" />
     </div>
   </div>
 
-  <div class="bonsai-soil-context">
-    <div class="bonsai-soil"></div>
-  </div>
+  <svg
+    class="bonsai-soil-flat"
+    viewBox="0 0 350 140"
+    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
+  >
+    <defs>
+      <clipPath id="bonsai-soil-clip">
+        <ellipse cx="175" cy="70" rx="175" ry="70" />
+      </clipPath>
+    </defs>
+    <!-- Filled green soil. -->
+    <ellipse cx="175" cy="70" rx="175" ry="70" class="bonsai-soil-fill" />
+    <!-- Same ellipse, stroked. Stroke is centered on the path; clipping
+         to the ellipse interior keeps only the inner half visible, so
+         the rim is a uniform 15 CSS px band sitting on the inside edge
+         of the soil. -->
+    <ellipse
+      cx="175"
+      cy="70"
+      rx="175"
+      ry="70"
+      class="bonsai-soil-rim"
+      clip-path="url(#bonsai-soil-clip)"
+    />
+  </svg>
 
   <div class="bonsai-stage" data-bonsai-rotator>
     <!-- Central tree, billboarded, no orbit. -->
@@ -96,15 +121,16 @@ const experienceById = new Map(experience.map((e) => [e.id, e]));
   .bonsai-perspective {
     position: relative;
     width: 100%;
-    max-width: 640px;
+    max-width: 720px;
     margin: 0 auto;
-    aspect-ratio: 640 / 580;
+    /* Shorter aspect (was 640/580) trims empty space above the tree;
+       pot width at max-width is 60% × 720 = 432px. */
+    aspect-ratio: 720 / 520;
     perspective: 1400px;
     perspective-origin: 50% 50%;
   }
 
   .bonsai-back-context,
-  .bonsai-soil-context,
   .bonsai-stage {
     position: absolute;
     inset: 0;
@@ -112,8 +138,11 @@ const experienceById = new Map(experience.map((e) => [e.id, e]));
     /* Shared bird's-eye tilt. Negative rotateX = looking down on the scene:
        points further from camera (back of orbit, -Z) rise on screen,
        points closer (front of orbit, +Z) sink.
-       NOTE: if changing this angle, also update Pot.astro's rim ellipse
-       ry/rx ratio to match sin(|angle|) so the pot keeps the same tilt. */
+       NOTE: this tilt only applies to the 3D contexts (pot body + stage).
+       The flat .bonsai-soil-flat layer between them is 2D and doesn't
+       tilt — plant orbits still compress vertically by sin(|angle|), so
+       if this angle changes, the soil ellipse's ry/rx should grow to
+       keep the inner edge just outside the largest plant projection. */
     transform: rotateX(-20deg);
     transform-origin: 50% 75%;
   }
@@ -130,36 +159,63 @@ const experienceById = new Map(experience.map((e) => [e.id, e]));
     cursor: grabbing;
   }
 
-  /* Pot — centered, no Z offset (sits on rotation axis). */
+  /* Pot — centered, no Z offset (sits on rotation axis). Body trapezoid
+     only; the visible rim lives on .bonsai-soil-flat above this layer.
+     Width is wider than the soil ellipse so the body's top corners get
+     tucked under the soil and the silhouette flows from soil outline
+     into body edge. Negative `bottom` pushes the body past the
+     container's bottom edge; combined with the back-context's -20° tilt
+     and the perspective scaling, the body's visible base lands just
+     inside the container edge instead of feeling cropped flat. */
   .bonsai-pot {
     position: absolute;
     left: 50%;
-    bottom: 0;
-    width: 52%;
+    bottom: -5%;
+    width: 60%;
     transform: translate3d(-50%, 0, 0);
     color: var(--bonsai-clay);
   }
 
-  /* Soil disc — horizontal in its own XZ plane. Radius 160 must be >= max
-     orbital radius (currently 155 for actuaViz) so trajectories stay
-     within the ellipse. */
-  .bonsai-soil {
+  /* Flat 2D soil + rim. Positioned the same way as the old 3D disc
+     (left: 50%; bottom: 21% with translate(-50%, 50%) centers on the
+     same point), so the tree and orbiters at bottom: 21% in the stage
+     context still appear to sit on it. Outer ellipse 350×140 (rx=175,
+     ry=70) is sized so the inner edge of the 15 CSS px stroke clears
+     the largest plant projection (r=155 → rx=155, ry=53). Fixed in px
+     because plant orbit radii are also fixed in px. */
+  .bonsai-soil-flat {
     position: absolute;
     left: 50%;
-    bottom: 21%;
-    width: 320px;
-    height: 320px;
-    border-radius: 50%;
-    background: var(--bonsai-sage);
-    transform: translate(-50%, 50%) rotateX(90deg);
-    transform-origin: 50% 50%;
+    /* `bottom: 31%` lands the soil's screen center on the pot body's
+       post-tilt top edge (the pot occupies the bottom ~31% of the
+       container in screen space). Was 21% when the container was
+       640×580; with the current 720×520 aspect the pot's top moved up
+       relative to the bottom, so this had to move with it. */
+    bottom: 31%;
+    /* Scaled ×1.125 vs 350×140 to keep soil proportional to the new
+       720px-max container. viewBox stays 350×140 so all ellipse coords
+       and stroke-width stay valid and scale with the CSS size. */
+    width: 394px;
+    height: 158px;
+    transform: translate(-50%, 50%);
+    pointer-events: none;
+  }
+  .bonsai-soil-fill {
+    fill: var(--bonsai-sage);
+  }
+  .bonsai-soil-rim {
+    fill: none;
+    stroke: var(--bonsai-clay);
+    /* Stroke-width is doubled vs. the desired band width because the
+       clip-path only keeps the inner half visible. */
+    stroke-width: 30;
   }
 
   /* Tree — centered, billboarded at orbit center. No orbit transform applied. */
   .bonsai-tree {
     position: absolute;
     left: 50%;
-    bottom: 21%;
+    bottom: 31%;
     width: 32%;
     transform: translate3d(-50%, 0, 0);
     color: var(--bonsai-leaf);
@@ -177,7 +233,7 @@ const experienceById = new Map(experience.map((e) => [e.id, e]));
   .bonsai-orbiter {
     position: absolute;
     left: 50%;
-    bottom: 21%;
+    bottom: 31%;
     transform-origin: 50% 100%;
     transform:
       translate3d(-50%, 0, 0)
@@ -388,10 +444,10 @@ const experienceById = new Map(experience.map((e) => [e.id, e]));
   }
 
   // Plant → experience navigation. Click or Enter/Space on a focused plant
-  // smooth-scrolls to that role's entry in the Experience section and
-  // pulses the timeline dot briefly. `scrollIntoView` inherits the
-  // document's `scroll-behavior`, which the global reduced-motion rule
-  // flips to `auto`, so no JS branch is needed here.
+  // dispatches `experience:open` with the role's id; `ExperiencePopup.astro`
+  // listens for that event and opens the matching panel in a native <dialog>.
+  // Decoupling via a custom event keeps this scene unaware of the modal's
+  // implementation.
   function bindPlantClicks(stage: HTMLElement) {
     const plantFrom = (e: Event) =>
       e.target instanceof Element
@@ -401,14 +457,9 @@ const experienceById = new Map(experience.map((e) => [e.id, e]));
     const activate = (target: Element) => {
       const id = target.getAttribute("data-experience-id");
       if (!id) return;
-      const dest = document.getElementById(`exp-${id}`);
-      if (!dest) return;
-      dest.scrollIntoView({ block: "start" });
-      // Remove → force reflow → re-add so the animation restarts even when
-      // the same plant is tapped twice in a row.
-      dest.classList.remove("bonsai-target-highlight");
-      void dest.offsetWidth;
-      dest.classList.add("bonsai-target-highlight");
+      document.dispatchEvent(
+        new CustomEvent("experience:open", { detail: { id } }),
+      );
     };
 
     stage.addEventListener("click", (e) => {
