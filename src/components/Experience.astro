@@ -25,7 +25,7 @@ const scheme: SectionScheme = {
       experience.map((job, idx) => (
         <li id={`exp-${job.id}`} class="relative group scroll-mt-24">
           {idx === 0 ? (
-            <span class="absolute -left-[34px] -top-0.5 size-6 transition-transform group-hover:scale-125">
+            <span class="exp-dot absolute -left-[34px] -top-0.5 size-6 transition-transform group-hover:scale-125">
               <Decoration
                 variant="star"
                 color="accent"
@@ -34,7 +34,7 @@ const scheme: SectionScheme = {
             </span>
           ) : (
             <span
-              class={`absolute -left-[31px] top-1.5 size-3.5 rounded-full ring-4 ring-[var(--color-bg)] transition-transform group-hover:scale-125 ${idx % 2 === 1 ? "bg-[var(--color-secondary)]" : "bg-[var(--color-accent)]"}`}
+              class={`exp-dot absolute -left-[31px] top-1.5 size-3.5 rounded-full ring-4 ring-[var(--color-bg)] transition-transform group-hover:scale-125 ${idx % 2 === 1 ? "bg-[var(--color-secondary)]" : "bg-[var(--color-accent)]"}`}
             />
           )}
           <div class="flex flex-wrap items-baseline justify-between gap-2">

@@ -209,6 +209,17 @@ a {
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 12' preserveAspectRatio='none'><path d='M2 8 Q 20 2 38 8 T 74 8 T 118 8' stroke='%23ffa46b' stroke-width='2.5' fill='none' stroke-linecap='round'/></svg>");
 }
 
+/* Bonsai target highlight — pulses the timeline dot of the experience
+   entry that a plant orbiter just scrolled the page to. The dot carries
+   `.exp-dot` in Experience.astro for both the star and circle variants. */
+@keyframes bonsai-target-pulse {
+  0%, 100% { transform: scale(1); }
+  35% { transform: scale(1.55); }
+}
+.bonsai-target-highlight .exp-dot {
+  animation: bonsai-target-pulse 1100ms cubic-bezier(0.21, 0.61, 0.35, 1);
+}
+
 /* View Transitions: smoother default name animation for body */
 @media (prefers-reduced-motion: no-preference) {
   ::view-transition-old(root),
