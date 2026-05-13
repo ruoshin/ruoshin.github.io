@@ -10,8 +10,6 @@ export type Experience = {
   summary: Localized;
   highlights: Localized[];
   stack: string[];
-  /** Hide this entry from the sidebar index (still shown in the Experience section). */
-  sidebarHidden?: boolean;
 };
 
 export const experience: Experience[] = [
@@ -114,44 +112,5 @@ export const experience: Experience[] = [
       ),
     ],
     stack: ["React", "Storybook", "JavaScript"],
-  },
-  {
-    id: "pace",
-    company: "北士設計 PACE Design",
-    shortName: tx("PACE Design", "PACE Design"),
-    href: "https://pace.com.tw",
-    role: tx("前端設計師", "Front-end Designer"),
-    period: "2015.1 — 2015.6",
-    summary: tx(
-      "參與品牌形象網站從規劃、設計到實作的完整流程，與品牌設計團隊深度協作。",
-      "Worked across the full brand-website lifecycle — strategy, design, and implementation — in close partnership with the brand design team.",
-    ),
-    highlights: [
-      tx(
-        "參與品牌形象網站開發的討論、設計與實作",
-        "Participated in the discussion, design, and build of brand websites.",
-      ),
-      tx(
-        "使用 jQuery、Bootstrap 製作 RWD 網站",
-        "Built responsive sites with jQuery and Bootstrap.",
-      ),
-      tx("撰寫 LESS 將 CSS 模組化", "Modularised stylesheets with LESS."),
-      tx("與客戶開會直接討論需求", "Met directly with clients to gather and clarify requirements."),
-    ],
-    stack: ["jQuery", "Bootstrap", "LESS", "RWD"],
-    sidebarHidden: true,
-  },
-  {
-    id: "toujia",
-    company: "台灣頭家",
-    role: tx("後端工程師", "PHP Developer"),
-    period: "2014.7 — 2014.12",
-    summary: tx(
-      "使用內部 PHP 框架開發後端功能，這段經驗奠定了與後端工程師溝通的基礎。",
-      "Built backend features on the company's in-house PHP framework. This stint shaped how I collaborate with backend engineers today.",
-    ),
-    highlights: [],
-    stack: ["PHP"],
-    sidebarHidden: true,
   },
 ];

@@ -34,10 +34,8 @@ export type BonsaiPlant = {
 // at 6% of 640, kinoko ~26px at 8%, flower ~16px at 5%, scaled by
 // `scale`) is rarely binding.
 export const bonsaiPlants: BonsaiPlant[] = [
-  { experienceId: "vocus", angle: 95, radius: 73, scale: 0.85, tilt: 6, color: "teal" },
-  { experienceId: "infocast", angle: 170, radius: 135, scale: 1.0, tilt: -5, color: "mustard" },
-  { experienceId: "toujia", angle: 235, radius: 96, scale: 0.9, tilt: 10, color: "lavender" },
-  { experienceId: "pace", angle: 310, radius: 130, scale: 0.95, tilt: -12, color: "rose" },
+  { experienceId: "vocus", angle: 315, radius: 73, scale: 0.85, tilt: 6, color: "teal" },
+  { experienceId: "infocast", angle: 45, radius: 135, scale: 1.0, tilt: -5, color: "mustard" },
 ];
 
 /** The central tree represents the "main" experience — typically the most
