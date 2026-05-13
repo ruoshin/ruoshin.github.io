@@ -147,14 +147,23 @@ const treeLabel = `${treeRole} · ${treeCompany}`;
 
 <style>
   .bonsai-perspective {
+    /* Single knob for the overall scene size. All fixed-px values below
+       (max-width, perspective, soil ellipse, and the per-orbiter --r passed
+       inline from bonsai-mapping.ts) multiply by this factor so the scene
+       grows uniformly without touching the data. Percent-based sizes
+       (pot/tree/plant width) scale automatically with max-width. */
+    --bonsai-scale: 1.2;
     position: relative;
     width: 100%;
-    max-width: 720px;
+    max-width: calc(720px * var(--bonsai-scale));
     margin: 0 auto;
     /* Shorter aspect (was 640/580) trims empty space above the tree;
-       pot width at max-width is 60% × 720 = 432px. */
+       pot width at max-width is 60% × 720 = 432px (× --bonsai-scale). */
     aspect-ratio: 720 / 520;
-    perspective: 1400px;
+    /* Perspective scales with the scene so the foreshortening ratio stays
+       constant — otherwise a bigger scene at the same camera distance reads
+       as more dramatically perspective-skewed. */
+    perspective: calc(1400px * var(--bonsai-scale));
     perspective-origin: 50% 50%;
   }
 
@@ -220,11 +229,13 @@ const treeLabel = `${treeRole} · ${treeCompany}`;
        640×580; with the current 720×520 aspect the pot's top moved up
        relative to the bottom, so this had to move with it. */
     bottom: 31%;
-    /* Scaled ×1.125 vs 350×140 to keep soil proportional to the new
-       720px-max container. viewBox stays 350×140 so all ellipse coords
-       and stroke-width stay valid and scale with the CSS size. */
-    width: 394px;
-    height: 158px;
+    /* Scaled ×1.125 vs 350×140 to keep soil proportional to the
+       720px-max container; multiplied again by --bonsai-scale so the
+       ellipse grows with the rest of the scene. viewBox stays 350×140
+       so all ellipse coords and stroke-width stay valid and scale with
+       the CSS size. */
+    width: calc(394px * var(--bonsai-scale));
+    height: calc(158px * var(--bonsai-scale));
     transform: translate(-50%, 50%);
     pointer-events: none;
   }
@@ -275,7 +286,7 @@ const treeLabel = `${treeRole} · ${treeCompany}`;
     transform:
       translate3d(-50%, 0, 0)
       rotateY(calc(var(--theta) + var(--rotation, 0deg)))
-      translate3d(0, 0, var(--r, 100px))
+      translate3d(0, 0, calc(var(--r, 100px) * var(--bonsai-scale)))
       rotateY(calc(-1 * (var(--theta) + var(--rotation, 0deg))))
       rotate(var(--tilt, 0deg))
       scale(var(--scale, 1));
