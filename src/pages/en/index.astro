@@ -1,25 +1,12 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import Header from "@/components/Header.astro";
-import Sidebar from "@/components/Sidebar.astro";
-import Footer from "@/components/Footer.astro";
 import BonsaiHero from "@/components/BonsaiHero.astro";
-import About from "@/components/About.astro";
-import Skills from "@/components/Skills.astro";
-import Contact from "@/components/Contact.astro";
 ---
 
 <BaseLayout>
   <Header />
-  <Sidebar />
-  <main class="xl:pl-sidebar">
+  <main>
     <BonsaiHero />
-    <div class="border-t border-[var(--color-border)]"></div>
-    <About />
-    <div class="border-t border-[var(--color-border)]"></div>
-    <Skills />
-    <div class="border-t border-[var(--color-border)]"></div>
-    <Contact />
   </main>
-  <Footer />
 </BaseLayout>

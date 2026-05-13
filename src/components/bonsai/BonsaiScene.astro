@@ -151,8 +151,11 @@ const treeLabel = `${treeRole} · ${treeCompany}`;
        (max-width, perspective, soil ellipse, and the per-orbiter --r passed
        inline from bonsai-mapping.ts) multiply by this factor so the scene
        grows uniformly without touching the data. Percent-based sizes
-       (pot/tree/plant width) scale automatically with max-width. */
-    --bonsai-scale: 1.2;
+       (pot/tree/plant width) scale automatically with max-width.
+       Set back to 0.85 to share the hero viewport with the soil bag and
+       leave room for the about/contact strips below — at 1.2 the scene
+       took the entire screen on its own. */
+    --bonsai-scale: 0.85;
     position: relative;
     width: 100%;
     max-width: calc(720px * var(--bonsai-scale));

@@ -2,24 +2,10 @@
 import Decoration from "./Decoration.astro";
 import Section, { type SectionScheme } from "./Section.astro";
 import { profile } from "@/data/profile";
-import { getLocale, ui } from "@/lib/i18n";
+import { aboutFacetsByLocale, getLocale, ui } from "@/lib/i18n";
 
 const locale = getLocale(Astro.currentLocale);
-
-const facets = [
-  {
-    title: ui.aboutFacetFrontend[locale],
-    body: ui.aboutFacetFrontendBody[locale],
-  },
-  {
-    title: ui.aboutFacetBackend[locale],
-    body: ui.aboutFacetBackendBody[locale],
-  },
-  {
-    title: ui.aboutFacetDesign[locale],
-    body: ui.aboutFacetDesignBody[locale],
-  },
-];
+const facets = aboutFacetsByLocale[locale];
 
 const scheme: SectionScheme = {
   blob: { color: "secondary", position: "top-8 -right-20 w-72" },

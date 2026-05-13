@@ -1,21 +1,22 @@
 ---
 import BonsaiScene from "./bonsai/BonsaiScene.astro";
 import ExperiencePopup from "./ExperiencePopup.astro";
-import { experience } from "@/data/experience";
+import Icon from "./Icon.astro";
+import SoilBag from "./SoilBag.astro";
 import { profile } from "@/data/profile";
-import { getLocale, ui } from "@/lib/i18n";
+import { skillGroups } from "@/data/skills";
+import { aboutFacetsByLocale, getLocale, ui } from "@/lib/i18n";
 
 const locale = getLocale(Astro.currentLocale);
-// "View experience" CTA opens the most recent role's popup (the first entry
-// in experience.ts is the current job).
-const featuredExperienceId = experience[0]?.id;
+const aboutFacets = aboutFacetsByLocale[locale];
 ---
 
 <section
   id="top"
-  class="relative min-h-[100svh] overflow-hidden px-6 pt-20 pb-12 md:pt-24 md:pb-16 grid grid-rows-[auto_1fr_auto] gap-6"
+  class="bonsai-hero relative min-h-[100svh] overflow-hidden px-6 pt-12 md:pt-14 pb-6 md:pb-8 grid grid-rows-[auto_1fr_auto] gap-3 md:gap-4"
 >
-  <!-- top: eyebrow + name -->
+  <!-- HEADER: eyebrow + name + tagline. Compact so the visual row gets the
+       lion's share of vertical space. -->
   <header class="relative z-10 w-full max-w-5xl mx-auto">
     <p
       class="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-[var(--color-accent)]"
@@ -23,52 +24,206 @@ const featuredExperienceId = experience[0]?.id;
       {ui.heroEyebrow[locale]}
     </p>
     <h1
-      class="font-display mt-3 text-4xl md:text-5xl lg:text-6xl font-semibold leading-[1.05]"
+      class="font-display mt-2 text-3xl md:text-5xl lg:text-6xl font-semibold leading-[1.05]"
     >
       <span class="title-underline">{profile.title[locale]}</span><span
         class="inline-block text-[var(--color-accent)]">.</span
       >
     </h1>
-  </header>
-
-  <!-- center: bonsai scene -->
-  <div class="relative z-10 flex items-center justify-center">
-    <BonsaiScene />
-  </div>
-
-  <!-- bottom: tagline + CTAs -->
-  <footer class="relative z-10 w-full max-w-5xl mx-auto">
     <p
-      class="max-w-2xl text-base md:text-lg text-[var(--color-fg)]/75 leading-relaxed"
+      class="mt-2 max-w-2xl text-sm md:text-base text-[var(--color-fg)]/70 leading-relaxed"
     >
       {profile.tagline[locale]}
     </p>
-    <div class="mt-6 flex flex-wrap gap-3 text-sm">
+  </header>
+
+  <!-- MIDDLE: bonsai scene + soil bag side-by-side at md+. -->
+  <div
+    class="relative z-10 grid md:grid-cols-[1fr_auto] gap-4 md:gap-8 items-center justify-items-center w-full max-w-5xl mx-auto"
+  >
+    <BonsaiScene />
+    <div class="flex justify-center md:justify-end items-end">
+      <SoilBag />
+    </div>
+  </div>
+
+  <!-- FOOTER: skills category grid (chips fly here from the bag) + about
+       facets + contact links. -->
+  <footer class="relative z-10 w-full max-w-5xl mx-auto space-y-3 md:space-y-4">
+    <!-- Skills category grid. Chips are pre-rendered at their final grid
+         slots but invisible (opacity:0). When the bag emits a chip the
+         physics script in SoilBag.astro sets `data-state="emitted"` and
+         starts driving its transform; once it lands the transform tweens
+         back to (0,0) which is its grid spot. -->
+    <div class="skills-grid" data-skills-grid>
       {
-        featuredExperienceId && (
-          <button
-            type="button"
-            data-open-experience={featuredExperienceId}
-            class="group inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--color-accent)] text-[var(--color-bg)] font-medium shadow-[0_8px_24px_-12px_var(--color-accent)] hover:bg-[var(--color-accent-hover)] hover:-translate-y-0.5 transition-all cursor-pointer"
-          >
-            {ui.heroCtaPrimary[locale]}
-            <span
-              aria-hidden="true"
-              class="transition-transform group-hover:translate-x-0.5"
-            >
-              →
-            </span>
-          </button>
-        )
+        skillGroups.map((group, gIdx) => (
+          <div class="skills-row" data-group-index={gIdx}>
+            <h3 class="skills-row-title">{group.title}</h3>
+            <ul class="skills-row-items">
+              {group.items.map((item, iIdx) => (
+                <li
+                  class="skills-chip"
+                  data-skill-chip
+                  data-skill-group={gIdx}
+                  data-skill-index={iIdx}
+                  data-state="hidden"
+                >
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
       }
+    </div>
+
+    <!-- About facets — compact inline cards. -->
+    <div class="grid sm:grid-cols-3 gap-2 md:gap-3">
+      {
+        aboutFacets.map((facet) => (
+          <div class="p-2.5 md:p-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-subtle)]/50">
+            <h3 class="font-mono text-[10px] uppercase tracking-widest text-[var(--color-accent)]">
+              {facet.title}
+            </h3>
+            <p class="mt-1 text-xs md:text-[13px] leading-snug text-[var(--color-fg)]/80">
+              {facet.body}
+            </p>
+          </div>
+        ))
+      }
+    </div>
+
+    <!-- Contact — directly exposed, no popup. Email + GitHub inline. -->
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
       <a
         href={`mailto:${profile.email}`}
-        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border-2 border-[var(--color-secondary)] text-[var(--color-secondary)] hover:bg-[var(--color-secondary)] hover:text-[var(--color-bg)] transition-colors"
+        class="inline-flex items-center gap-1.5 text-[var(--color-fg)]/85 hover:text-[var(--color-accent)] transition-colors"
       >
-        {ui.heroCtaSecondary[locale]}
+        <Icon name="mail" />
+        {profile.email}
+      </a>
+      <span class="text-[var(--color-muted)]" aria-hidden="true">·</span>
+      <a
+        href={profile.links.github}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center gap-1.5 text-[var(--color-fg)]/85 hover:text-[var(--color-secondary)] transition-colors"
+      >
+        <Icon name="github" />
+        {ui.contactGithub[locale]}
       </a>
     </div>
   </footer>
 </section>
 
 <ExperiencePopup />
+
+<style>
+  /* Skills category grid — 2 columns on md+, 1 column on mobile. Each row
+     pairs a category title with its chips. Chips reserve layout space at
+     all times (display:inline-flex) but stay invisible until the bag's
+     physics script marks them emitted/settled. */
+  .skills-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.25rem 1.5rem;
+  }
+  @media (min-width: 768px) {
+    .skills-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .skills-row {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 0.5rem;
+    align-items: baseline;
+    min-height: 22px;
+    /* Negative-margin trick so the [data-active] tinted background can
+       extend a few px past the grid cell without changing layout. */
+    padding: 2px 6px;
+    margin: -2px -6px;
+    border-radius: 8px;
+    transition: background-color 220ms ease;
+  }
+  .skills-row[data-active] {
+    background-color: color-mix(in oklch, var(--color-accent) 9%, transparent);
+  }
+  .skills-row-title {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-muted);
+    text-align: right;
+    line-height: 1.4;
+    margin: 0;
+    transition: color 220ms ease;
+  }
+  .skills-row[data-active] .skills-row-title {
+    color: var(--color-accent);
+  }
+  .skills-row-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* A chip is always in its grid slot; the physics layer overrides its
+     visual position via inline transform during flight. */
+  .skills-chip {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 11px;
+    line-height: 1.35;
+    background: var(--color-subtle);
+    color: var(--color-fg);
+    border: 1px solid var(--color-border);
+    border-radius: 9999px;
+    white-space: nowrap;
+    opacity: 0;
+    /* will-change to hint the compositor; cleared after settle. */
+    will-change: transform, opacity;
+    /* Subtle landing pop driven by data-state changes. Flying skips the
+       transition; settling uses bouncy ease so the chip lands with a tiny
+       overshoot. */
+    transition:
+      opacity 220ms ease-out,
+      transform 0ms;
+  }
+  .skills-chip[data-state="emitted"] {
+    opacity: 1;
+    transition:
+      opacity 180ms ease-out,
+      transform 0ms;
+  }
+  .skills-chip[data-state="settling"] {
+    opacity: 1;
+    transition:
+      opacity 180ms ease-out,
+      transform 520ms cubic-bezier(0.34, 1.4, 0.5, 1);
+  }
+  .skills-chip[data-state="settled"] {
+    opacity: 1;
+    transition: opacity 180ms ease-out;
+    will-change: auto;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    /* Reduced-motion path: chips appear at their grid spots without flight
+       or transitions. The bag emission script also short-circuits its
+       physics loop under this flag. */
+    .skills-chip,
+    .skills-chip[data-state="emitted"],
+    .skills-chip[data-state="settling"],
+    .skills-chip[data-state="settled"] {
+      transition: none;
+    }
+  }
+</style>
+

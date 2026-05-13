@@ -58,22 +58,6 @@ export const ui = {
     "zh-Hant": "跨領域思維。",
     en: "Cross-functional by design.",
   },
-  aboutFacetFrontend: { "zh-Hant": "Frontend", en: "Frontend" },
-  aboutFacetFrontendBody: {
-    "zh-Hant": "十年以上 React 與現代前端工具鏈經驗，從產品架構到細節互動都能掌握。",
-    en: "Over a decade of React and modern frontend tooling — comfortable from product architecture down to interaction details.",
-  },
-  aboutFacetBackend: { "zh-Hant": "Backend-aware", en: "Backend-aware" },
-  aboutFacetBackendBody: {
-    "zh-Hant": "曾任 PHP 後端工程師，能與後端工程師有效對話、共同設計 API 與資料流。",
-    en: "Former PHP developer — able to design API contracts and data flows together with backend engineers.",
-  },
-  aboutFacetDesign: { "zh-Hant": "Design-aware", en: "Design-aware" },
-  aboutFacetDesignBody: {
-    "zh-Hant": "前端設計背景出身，熟悉 Figma 與設計協作流程，能還原並提出可行性建議。",
-    en: "Frontend designer background — fluent in Figma and design handoff, able to translate intent and surface tradeoffs.",
-  },
-
   experienceLabel: { "zh-Hant": "Experience", en: "Experience" },
   modalClose: { "zh-Hant": "關閉", en: "Close" },
   modalRelatedProjects: { "zh-Hant": "相關專案", en: "Related projects" },
@@ -82,6 +66,26 @@ export const ui = {
   skillsTitle: {
     "zh-Hant": "常用的工具。",
     en: "Tools of the trade.",
+  },
+  skillsBagHint: {
+    "zh-Hant": "沿虛線剪開",
+    en: "Cut along the dotted line",
+  },
+  skillsBagOpen: {
+    "zh-Hant": "剪開肥料袋",
+    en: "Open the bag",
+  },
+  skillsBagLabel: {
+    "zh-Hant": "技能肥料",
+    en: "Skill blend",
+  },
+  skillsBagTilt: {
+    "zh-Hant": "拿起來向左傾倒",
+    en: "Lift & tilt to pour",
+  },
+  skillsBagReset: {
+    "zh-Hant": "重新裝袋",
+    en: "Refill bag",
   },
 
   contactLabel: { "zh-Hant": "Contact", en: "Contact" },
@@ -101,3 +105,37 @@ export const ui = {
     en: "Built with Astro · Tailwind CSS · GitHub Pages",
   },
 } satisfies Record<string, Localized>;
+
+/** About-page facets surfaced under the bonsai. Bundled as a single
+ *  Localized array (rather than six separate `Localized<string>` keys
+ *  under `ui`) so the consuming component just iterates `[locale]`. */
+export const aboutFacetsByLocale: Localized<{ title: string; body: string }[]> = {
+  "zh-Hant": [
+    {
+      title: "Frontend",
+      body: "十年以上 React 與現代前端工具鏈經驗，從產品架構到細節互動都能掌握。",
+    },
+    {
+      title: "Backend-aware",
+      body: "曾任 PHP 後端工程師，能與後端工程師有效對話、共同設計 API 與資料流。",
+    },
+    {
+      title: "Design-aware",
+      body: "前端設計背景出身，熟悉 Figma 與設計協作流程，能還原並提出可行性建議。",
+    },
+  ],
+  en: [
+    {
+      title: "Frontend",
+      body: "Over a decade of React and modern frontend tooling — comfortable from product architecture down to interaction details.",
+    },
+    {
+      title: "Backend-aware",
+      body: "Former PHP developer — able to design API contracts and data flows together with backend engineers.",
+    },
+    {
+      title: "Design-aware",
+      body: "Frontend designer background — fluent in Figma and design handoff, able to translate intent and surface tradeoffs.",
+    },
+  ],
+};
