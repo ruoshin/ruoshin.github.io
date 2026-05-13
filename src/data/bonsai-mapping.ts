@@ -43,7 +43,7 @@ export const bonsaiPlants: BonsaiPlant[] = [
 /** The central tree represents the "main" experience — typically the most
  *  recent role. Clicking the tree opens that experience's popup just like
  *  the orbiting plants do. */
-export const bonsaiTreeExperienceId = "actuaViz";
+export const bonsaiTreeExperienceId = "actuaviz";
 
 /** Decorative orbiters — no experience linkage, just visual fill. */
 export type BonsaiDecorationKind = "kinoko" | "flower";

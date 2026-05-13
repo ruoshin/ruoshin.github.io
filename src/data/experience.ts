@@ -16,7 +16,7 @@ export type Experience = {
 
 export const experience: Experience[] = [
   {
-    id: "actuaViz",
+    id: "actuaviz",
     company: "ActuaViz",
     href: "https://www.actuaviz.com",
     role: tx("資深前端工程師", "Senior Front-end Developer"),
