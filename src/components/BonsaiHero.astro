@@ -141,15 +141,6 @@ const aboutFacets = aboutFacetsByLocale[locale];
     gap: 0.5rem;
     align-items: baseline;
     min-height: 22px;
-    /* Negative-margin trick so the [data-active] tinted background can
-       extend a few px past the grid cell without changing layout. */
-    padding: 2px 6px;
-    margin: -2px -6px;
-    border-radius: 8px;
-    transition: background-color 220ms ease;
-  }
-  .skills-row[data-active] {
-    background-color: color-mix(in oklch, var(--color-accent) 9%, transparent);
   }
   .skills-row-title {
     font-family: var(--font-mono);

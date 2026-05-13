@@ -262,7 +262,7 @@ const locale = getLocale(Astro.currentLocale);
     z-index: 50;
   }
   .soil-bag[data-state="empty"] {
-    cursor: default;
+    cursor: grab;
     opacity: 0.85;
   }
   .soil-bag:focus-visible {
@@ -342,10 +342,6 @@ const locale = getLocale(Astro.currentLocale);
   .soil-bag-label,
   .soil-bag-sublabel {
     transition: opacity 400ms ease;
-  }
-  .soil-bag:not([data-state="sealed"]) .soil-bag-label,
-  .soil-bag:not([data-state="sealed"]) .soil-bag-sublabel {
-    opacity: 0;
   }
 
   /* Granule shower fired during cut only. */
@@ -508,7 +504,7 @@ const locale = getLocale(Astro.currentLocale);
     for (const [g, chips] of chipsByGroup) {
       chipsByGroup.set(g, shuffled(chips));
     }
-    let activeGroup: number | null = null;
+    let activeGroups: Set<number> = new Set();
     let emittedTotal = 0;
     const totalChips = allChips.length;
 
@@ -516,29 +512,42 @@ const locale = getLocale(Astro.currentLocale);
     let rafId: number | null = null;
     let lastTickMs = 0;
 
-    // Determine which skill row the bag's mouth is currently over. Uses
-    // the SVG mouth marker (post-transform position) and rect-contains
-    // against each row's grid cell. Returns null if mouth isn't over any
-    // row (mid-air between bonsai and the grid, off-screen, etc.).
-    function findActiveGroup(): number | null {
-      if (!mouthMarker) return null;
+    // Determine which skill rows the bag's mouth is currently over. The
+    // hit-test rect is expanded vertically by the row's own height, so a
+    // mouth centered on row N also falls inside the expanded bounds of the
+    // rows directly above and below it in the same column — pouring spans
+    // three vertically adjacent rows at once.
+    function findActiveGroups(): Set<number> {
+      const result = new Set<number>();
+      if (!mouthMarker) return result;
       const m = mouthMarker.getBoundingClientRect();
       const px = m.left + m.width / 2;
       const py = m.top + m.height / 2;
       for (const row of skillRows) {
         const r = row.getBoundingClientRect();
-        if (px >= r.left && px <= r.right && py >= r.top && py <= r.bottom) {
-          return Number(row.dataset.groupIndex);
+        const expandY = r.height;
+        if (
+          px >= r.left &&
+          px <= r.right &&
+          py >= r.top - expandY &&
+          py <= r.bottom + expandY
+        ) {
+          result.add(Number(row.dataset.groupIndex));
         }
       }
-      return null;
+      return result;
     }
 
-    function setActiveGroup(g: number | null) {
-      if (g === activeGroup) return;
-      activeGroup = g;
+    function setActiveGroups(groups: Set<number>) {
+      if (
+        groups.size === activeGroups.size &&
+        [...groups].every((g) => activeGroups.has(g))
+      ) {
+        return;
+      }
+      activeGroups = groups;
       for (const row of skillRows) {
-        if (Number(row.dataset.groupIndex) === g) {
+        if (activeGroups.has(Number(row.dataset.groupIndex))) {
           row.dataset.active = "1";
         } else {
           delete row.dataset.active;
@@ -594,16 +603,27 @@ const locale = getLocale(Astro.currentLocale);
     }
 
     // Returns:
-    //   "done"  — everything in this group already poured (keep timer running
-    //             so user can move to another group)
+    //   "done"  — every currently-active group is drained (keep timer running
+    //             so the user can move to another group)
     //   "all"   — every chip across every group is poured (stop everything)
     //   "ok"    — one chip emitted
     //   "idle"  — bag isn't over any group right now (timer keeps ticking)
     function emitNext(): "ok" | "done" | "all" | "idle" {
       if (emittedTotal >= totalChips) return "all";
-      if (activeGroup === null) return "idle";
-      const groupChips = chipsByGroup.get(activeGroup);
-      if (!groupChips) return "done";
+      if (activeGroups.size === 0) return "idle";
+      // Among the currently-active rows, gather any group that still has
+      // hidden chips and pick one at random — gives a mixed pour across
+      // the vertically adjacent rows rather than draining them in order.
+      const candidates: { g: number; chips: HTMLElement[] }[] = [];
+      for (const g of activeGroups) {
+        const chips = chipsByGroup.get(g);
+        if (chips?.some((c) => c.dataset.state === "hidden")) {
+          candidates.push({ g, chips });
+        }
+      }
+      if (candidates.length === 0) return "done";
+      const { chips: groupChips } =
+        candidates[Math.floor(Math.random() * candidates.length)];
       const chip = groupChips.find((c) => c.dataset.state === "hidden");
       if (!chip) return "done";
       emittedTotal++;
@@ -682,7 +702,12 @@ const locale = getLocale(Astro.currentLocale);
     let lockedRot = 0;
 
     function onPointerDownLift(e: PointerEvent) {
-      if (bag.dataset.state !== "opened") return;
+      // Allow pickup in both "opened" and "empty" — once everything has
+      // been poured the bag is still a draggable prop, just with no chips
+      // left to emit (emitNext() returns "all" on the next tick).
+      if (bag.dataset.state !== "opened" && bag.dataset.state !== "empty") {
+        return;
+      }
       pointerDown = true;
       startX = e.clientX;
       startY = e.clientY;
@@ -707,8 +732,9 @@ const locale = getLocale(Astro.currentLocale);
       );
 
       // Rotation candidate from horizontal pointer delta. Locked once
-      // tilting; otherwise follows the drag 1:0.55.
-      const candidate = Math.max(-110, Math.min(15, rawDx * 0.55));
+      // tilting; otherwise follows the drag with a steeper response so the
+      // pouring pose reads more clearly without requiring a huge drag.
+      const candidate = Math.max(-120, Math.min(15, rawDx * 0.75));
       let rot: number;
       if (bag.dataset.state === "tilting") {
         // Allow deeper tilt, never lighter. lockedRot stores the deepest
@@ -723,7 +749,7 @@ const locale = getLocale(Astro.currentLocale);
       // Whichever category the bag's mouth is currently over becomes the
       // active group — emitNext() will read this on each tick. Updated on
       // every move so dragging across the grid switches groups live.
-      setActiveGroup(findActiveGroup());
+      setActiveGroups(findActiveGroups());
 
       // Enter tilting once the threshold is crossed; never auto-exit
       // (the only way out is pointerup). This is the "don't rebound"
@@ -746,22 +772,25 @@ const locale = getLocale(Astro.currentLocale);
         bag.releasePointerCapture(e.pointerId);
       }
       stopEmission();
-      setActiveGroup(null);
+      setActiveGroups(new Set());
       lockedRot = 0;
       bag.removeAttribute("data-dragging");
-      // Bag stays where it was released (no position snap-back); only the
-      // rotation eases back to upright, since "putting it down" implies
-      // the pour is over. The bag's CSS transform-transition animates the
-      // angle change once data-dragging is removed.
-      const { dx, dy } = getBagOffset(bag);
-      setTransform(bag, dx, dy, 0);
       // Don't clobber a reset() that fired mid-drag (sealed comes from
       // the reset button). Otherwise the terminal state is decided here,
       // not in the emission tick, so an in-progress gesture finishes
       // smoothly even if the final chip poured before release.
       if (bag.dataset.state === "sealed") return;
-      bag.dataset.state =
-        emittedTotal >= totalChips ? "empty" : "opened";
+      const nowEmpty = emittedTotal >= totalChips;
+      bag.dataset.state = nowEmpty ? "empty" : "opened";
+      // Empty bags spring back to their original slot — pouring is over,
+      // the prop has no business sitting in the middle of the grid.
+      // Non-empty bags stay where released so the user can return to the
+      // same spot for the next pour; only rotation eases back to upright.
+      if (nowEmpty) {
+        setTransform(bag, 0, 0, 0);
+      } else {
+        bag.style.setProperty("--bag-rot", "0deg");
+      }
     }
 
     // ---- Stage 1: cut interaction ------------------------------------
@@ -845,7 +874,7 @@ const locale = getLocale(Astro.currentLocale);
         chipsByGroup.set(g, shuffled(chips));
       }
       emittedTotal = 0;
-      setActiveGroup(null);
+      setActiveGroups(new Set());
       bag.removeAttribute("data-dragging");
       setProgress(bag, 0);
       setTransform(bag, 0, 0, 0);
