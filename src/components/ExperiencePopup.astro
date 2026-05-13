@@ -62,7 +62,26 @@ for (const project of projects) {
                   <span class="bonsai-modal-title-sep"> · </span>
                   {job.href ? (
                     <ExternalLink href={job.href} class="bonsai-modal-company">
-                      {job.company}
+                      <span class="bonsai-modal-company-inner">
+                        <span class="bonsai-modal-company-text">
+                          {job.company}
+                        </span>
+                        <svg
+                          class="bonsai-modal-company-squiggle"
+                          viewBox="0 0 100 6"
+                          preserveAspectRatio="none"
+                          aria-hidden="true"
+                        >
+                          <path
+                            d="M1 3.4 Q 12 0.8 24 3.4 T 50 3.4 T 76 3.4 T 99 3.4"
+                            stroke="currentColor"
+                            stroke-width="1.6"
+                            stroke-linecap="round"
+                            fill="none"
+                            vector-effect="non-scaling-stroke"
+                          />
+                        </svg>
+                      </span>
                     </ExternalLink>
                   ) : (
                     <span class="bonsai-modal-company">{job.company}</span>
@@ -247,6 +266,29 @@ for (const project of projects) {
   }
   a.bonsai-modal-company:hover {
     color: var(--color-accent);
+  }
+  .bonsai-modal-company-inner {
+    position: relative;
+    display: inline-block;
+  }
+  .bonsai-modal-company-squiggle {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -0.32em;
+    width: 100%;
+    height: 0.42em;
+    color: var(--color-accent);
+    opacity: 0.7;
+    pointer-events: none;
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+  }
+  .bonsai-modal-company:hover .bonsai-modal-company-squiggle,
+  .bonsai-modal-company:focus-visible .bonsai-modal-company-squiggle {
+    opacity: 1;
+    transform: translateY(1px);
   }
   .bonsai-modal-period {
     margin-top: 0.5rem;
