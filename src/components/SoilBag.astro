@@ -481,6 +481,21 @@ const locale = getLocale(Astro.currentLocale);
       "(prefers-reduced-motion: reduce)",
     ).matches;
 
+    // ---- Garden coupling signals -------------------------------------
+    // Mirror the "all skills poured" state to the html attribute (used by
+    // CSS to show the bonsai's full population without animation on
+    // returning visits) and fire the garden:* events that BonsaiScene
+    // listens for. Centralised so the three call sites (auto-pour
+    // completion, keyboard pour-all, reset) can't drift.
+    function signalBloom() {
+      document.documentElement.setAttribute("data-skills-poured", "");
+      document.dispatchEvent(new CustomEvent("garden:bloom"));
+    }
+    function signalReset() {
+      document.documentElement.removeAttribute("data-skills-poured");
+      document.dispatchEvent(new CustomEvent("garden:reset"));
+    }
+
     // ---- Chip references and per-category emission --------------------
     // Chips live in BonsaiHero's skills-grid. Group them by data-skill-
     // group so that pouring is driven by which category the bag is over
@@ -627,6 +642,13 @@ const locale = getLocale(Astro.currentLocale);
       const chip = groupChips.find((c) => c.dataset.state === "hidden");
       if (!chip) return "done";
       emittedTotal++;
+      // Tell the bonsai a chip has landed — BonsaiScene grows one more
+      // orbiter when its share of the pour crosses the next threshold.
+      document.dispatchEvent(
+        new CustomEvent("garden:tick", {
+          detail: { emitted: emittedTotal, total: totalChips },
+        }),
+      );
 
       if (reduceMotion || !mouthMarker) {
         chip.dataset.state = "settled";
@@ -678,6 +700,7 @@ const locale = getLocale(Astro.currentLocale);
           } catch {
             // ignore
           }
+          signalBloom();
         }
       }, EMIT_INTERVAL_MS);
     }
@@ -885,6 +908,7 @@ const locale = getLocale(Astro.currentLocale);
       } catch {
         // ignore
       }
+      signalReset();
     }
     const resetBtn = bag.parentElement?.querySelector<HTMLButtonElement>(
       "[data-soil-bag-reset]",
@@ -943,6 +967,7 @@ const locale = getLocale(Astro.currentLocale);
         } catch {
           // ignore
         }
+        signalBloom();
       }
     });
   }

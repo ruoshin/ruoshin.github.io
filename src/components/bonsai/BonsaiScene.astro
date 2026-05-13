@@ -286,19 +286,107 @@ const treeLabel = `${treeRole} · ${treeCompany}`;
     left: 50%;
     bottom: 31%;
     transform-origin: 50% 100%;
+    /* Orbit transform — runs every frame via --rotation (driven by GSAP).
+       Note: per-instance `scale(var(--scale))` was lifted out of this chain
+       onto the standalone `scale` CSS property below, so the emergence
+       animation can transition the visible size without smoothing the
+       per-frame spin (which would happen if we put any transition on
+       `transform`). */
     transform:
       translate3d(-50%, 0, 0)
       rotateY(calc(var(--theta) + var(--rotation, 0deg)))
       translate3d(0, 0, calc(var(--r, 100px) * var(--bonsai-scale)))
       rotateY(calc(-1 * (var(--theta) + var(--rotation, 0deg))))
-      rotate(var(--tilt, 0deg))
-      scale(var(--scale, 1));
-    will-change: transform;
+      rotate(var(--tilt, 0deg));
+    /* Emergence: hidden = opacity 0 + scale 0 (sucked into the soil at
+       transform-origin 50% 100%). The standalone `scale` property composes
+       with the `transform` matrix multiplicatively and uses the same
+       transform-origin, so the orbiter visually grows up out of the dirt. */
+    opacity: 0;
+    scale: 0;
+    pointer-events: none;
+    transition:
+      opacity 600ms ease-out,
+      scale 700ms cubic-bezier(0.34, 1.5, 0.5, 1);
+    will-change: transform, scale, opacity;
+  }
+  .bonsai-orbiter[data-orbit-state="revealed"],
+  :root[data-skills-poured] .bonsai-orbiter {
+    opacity: 1;
+    scale: var(--scale, 1);
+    pointer-events: auto;
+  }
+  /* Returning visitors skip the emergence transition entirely — orbiters
+     are fully grown from first paint. */
+  :root[data-skills-poured] .bonsai-orbiter {
+    transition: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bonsai-orbiter {
+      transition: none;
+      opacity: 1;
+      scale: var(--scale, 1);
+    }
   }
 
   .bonsai-plant { width: 6%; }
   .bonsai-kinoko { width: 8%; }
   .bonsai-flower { width: 5%; }
+
+  /* Bloom climax — fired once when the final skill chip is poured. A warm
+     radial glow rises behind the scene; the central tree and every orbiter
+     get a brief brightness pulse. After the animation ends the JS clears
+     [data-bloom] and the scene settles into its filled steady state. */
+  .bonsai-perspective {
+    /* Single source of truth for the bloom climax length; CSS animations
+       below all read this, and the JS that schedules [data-bloom] removal
+       reads it via getComputedStyle so the attribute is cleared exactly
+       when the animations end. */
+    --bloom-duration: 2400ms;
+    position: relative;
+  }
+  .bonsai-perspective[data-bloom]::after {
+    content: "";
+    position: absolute;
+    inset: -10%;
+    background: radial-gradient(
+      circle at 50% 65%,
+      color-mix(in oklch, var(--bonsai-mustard) 50%, transparent) 0%,
+      color-mix(in oklch, var(--bonsai-mustard) 20%, transparent) 30%,
+      transparent 65%
+    );
+    pointer-events: none;
+    z-index: 0;
+    animation: bonsai-bloom-glow var(--bloom-duration) ease-out forwards;
+  }
+  @keyframes bonsai-bloom-glow {
+    0% { opacity: 0; }
+    18% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  .bonsai-perspective[data-bloom] .bonsai-tree {
+    animation: bonsai-bloom-tree var(--bloom-duration) ease-out;
+  }
+  @keyframes bonsai-bloom-tree {
+    0%, 100% { filter: none; }
+    25%, 60% {
+      filter: brightness(1.15) drop-shadow(0 0 10px currentColor);
+    }
+  }
+  .bonsai-perspective[data-bloom] .bonsai-orbiter {
+    animation: bonsai-bloom-orbiter var(--bloom-duration) ease-out;
+  }
+  @keyframes bonsai-bloom-orbiter {
+    0%, 100% { filter: none; }
+    40%, 70% { filter: brightness(1.2) saturate(1.2); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bonsai-perspective[data-bloom]::after,
+    .bonsai-perspective[data-bloom] .bonsai-tree,
+    .bonsai-perspective[data-bloom] .bonsai-orbiter {
+      animation: none;
+    }
+  }
 
   .bonsai-tree svg,
   .bonsai-orbiter svg {
@@ -396,10 +484,13 @@ const treeLabel = `${treeRole} · ${treeCompany}`;
   type StageController = {
     state: { r: number };
     tween: gsap.core.Tween | null;
+    cleanups: Array<() => void>;
   };
 
   // One controller per stage element. Killed on astro:before-swap so the old
   // tween stops writing --rotation to a detached element after a locale switch.
+  // `cleanups` collects document-level listener removers (garden events) that
+  // would otherwise accumulate across page-load events.
   const controllers = new WeakMap<HTMLElement, StageController>();
 
   function startAutoSpin(
@@ -542,6 +633,111 @@ const treeLabel = `${treeRole} · ${treeCompany}`;
     });
   }
 
+  // Garden coupling — orbiters (experience plants + decorations) start
+  // hidden in CSS and emerge as skill chips pour out of SoilBag. SoilBag
+  // dispatches:
+  //   garden:tick   { emitted, total }  — one chip just landed
+  //   garden:bloom                       — every chip is poured (climax)
+  //   garden:reset                       — reset button cleared everything
+  // BonsaiScene reveals orbiters proportionally on tick, flashes the bloom
+  // animation on bloom, and resets state on reset. The pre-paint script in
+  // BaseLayout sets <html data-skills-poured> for returning visitors so the
+  // CSS shows everything from first paint (no FOUC, no animation replay).
+  // Parses a CSS time value ("2400ms" or "2.4s") into milliseconds. Used to
+  // sync the JS bloom-attribute teardown with the CSS keyframe length so the
+  // duration lives in exactly one place (--bloom-duration on .bonsai-perspective).
+  function parseCssDuration(value: string): number {
+    const trimmed = value.trim();
+    const num = Number.parseFloat(trimmed);
+    if (!Number.isFinite(num)) return 0;
+    return trimmed.endsWith("ms") ? num : num * 1000;
+  }
+
+  function bindGarden(
+    perspective: HTMLElement,
+    stage: HTMLElement,
+    ctrl: StageController,
+  ) {
+    // Experience plants render first so the meaningful orbiters emerge
+    // ahead of decorative filler. Order within each kind preserved.
+    const plants = Array.from(
+      stage.querySelectorAll<HTMLElement>(".bonsai-plant"),
+    );
+    const decorations = Array.from(
+      stage.querySelectorAll<HTMLElement>(
+        ".bonsai-orbiter:not(.bonsai-plant)",
+      ),
+    );
+    const orbiters = [...plants, ...decorations];
+    if (orbiters.length === 0) return;
+
+    // The visible state is driven by CSS (`:root[data-skills-poured]` or
+    // `[data-orbit-state="revealed"]`), but `inert` must be toggled
+    // imperatively — CSS can't add/remove HTML attributes. Initial inert
+    // mirrors visibility: returning visitors (pre-paint script has set
+    // the root attribute) start with fully interactive orbiters; first-
+    // time visitors start with everything inert until emergence.
+    const alreadyPoured =
+      document.documentElement.hasAttribute("data-skills-poured");
+    for (const el of orbiters) {
+      el.toggleAttribute("inert", !alreadyPoured);
+    }
+
+    function revealUpTo(n: number) {
+      const target = Math.min(orbiters.length, Math.max(0, n));
+      for (let i = 0; i < orbiters.length; i++) {
+        if (i < target && orbiters[i].dataset.orbitState !== "revealed") {
+          orbiters[i].dataset.orbitState = "revealed";
+          orbiters[i].removeAttribute("inert");
+        }
+      }
+    }
+
+    let bloomTimer: number | null = null;
+    function onTick(e: Event) {
+      const detail = (e as CustomEvent<{ emitted: number; total: number }>)
+        .detail;
+      if (!detail || detail.total <= 0) return;
+      const progress = detail.emitted / detail.total;
+      revealUpTo(Math.floor(progress * orbiters.length));
+    }
+    function onBloom() {
+      // Force every orbiter visible — the last tick's floor() can leave
+      // the final orbiter just under threshold by a rounding margin.
+      revealUpTo(orbiters.length);
+      perspective.setAttribute("data-bloom", "");
+      if (bloomTimer !== null) window.clearTimeout(bloomTimer);
+      const durationMs = parseCssDuration(
+        getComputedStyle(perspective).getPropertyValue("--bloom-duration"),
+      );
+      bloomTimer = window.setTimeout(() => {
+        perspective.removeAttribute("data-bloom");
+        bloomTimer = null;
+      }, durationMs);
+    }
+    function onReset() {
+      if (bloomTimer !== null) {
+        window.clearTimeout(bloomTimer);
+        bloomTimer = null;
+      }
+      perspective.removeAttribute("data-bloom");
+      for (const el of orbiters) {
+        delete el.dataset.orbitState;
+        el.toggleAttribute("inert", true);
+      }
+    }
+
+    document.addEventListener("garden:tick", onTick);
+    document.addEventListener("garden:bloom", onBloom);
+    document.addEventListener("garden:reset", onReset);
+    ctrl.cleanups.push(() => {
+      document.removeEventListener("garden:tick", onTick);
+      document.removeEventListener("garden:bloom", onBloom);
+      document.removeEventListener("garden:reset", onReset);
+      if (bloomTimer !== null) window.clearTimeout(bloomTimer);
+    });
+  }
+
   function setupBonsai() {
     const stages = document.querySelectorAll<HTMLElement>(
       "[data-bonsai-rotator]:not([data-bonsai-init])",
@@ -555,7 +751,11 @@ const treeLabel = `${treeRole} · ${treeCompany}`;
     for (const stage of stages) {
       stage.setAttribute("data-bonsai-init", "");
 
-      const ctrl: StageController = { state: { r: 0 }, tween: null };
+      const ctrl: StageController = {
+        state: { r: 0 },
+        tween: null,
+        cleanups: [],
+      };
       controllers.set(stage, ctrl);
 
       if (!reduceMotion) {
@@ -564,6 +764,9 @@ const treeLabel = `${treeRole} · ${treeCompany}`;
 
       bindPointerDrag(stage, ctrl, reduceMotion);
       bindPlantClicks(stage);
+
+      const perspective = stage.closest<HTMLElement>(".bonsai-perspective");
+      if (perspective) bindGarden(perspective, stage, ctrl);
     }
   }
 
@@ -573,6 +776,7 @@ const treeLabel = `${treeRole} · ${treeCompany}`;
       .forEach((stage) => {
         const ctrl = controllers.get(stage);
         ctrl?.tween?.kill();
+        ctrl?.cleanups.forEach((fn) => fn());
         controllers.delete(stage);
       });
   }

@@ -61,6 +61,19 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
         if (theme === "dark") document.documentElement.classList.add("dark");
       })();
     </script>
+
+    <script is:inline>
+      // Returning visitors who've already poured all skills should see the
+      // full bonsai (all plants + decorations) immediately. Pre-paint so the
+      // initially-hidden orbiter CSS doesn't flash on revisit.
+      (function () {
+        try {
+          if (localStorage.getItem("skills-bag-emptied") === "1") {
+            document.documentElement.setAttribute("data-skills-poured", "");
+          }
+        } catch {}
+      })();
+    </script>
   </head>
 
   <body class="min-h-screen flex flex-col">
