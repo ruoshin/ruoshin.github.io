@@ -116,6 +116,61 @@ a {
 .hero-stagger > *:nth-child(3) { animation-delay: 180ms; }
 .hero-stagger > *:nth-child(4) { animation-delay: 270ms; }
 
+/* Hero scene entrance: drop the bonsai assembly bottom-up
+   (盆 → 土 → 樹), then the bag — establishing a visual narrative where
+   the bag arrives last ("start here"). Uses the standalone `translate`
+   property (not the transform function) so it composes with the existing
+   3D tilt transforms on the bonsai layers and the GSAP-driven
+   auto-rotation on .bonsai-stage. The `backwards` fill keeps elements
+   off-screen during animation-delay.
+
+   Timings live in :root so SoilBag's halo entrance can anchor to the
+   bag's drop end without duplicating the number across files. */
+:root {
+  --hero-drop-duration: 720ms;
+  --hero-drop-back-delay: 240ms;   /* 盆 — pot */
+  --hero-drop-soil-delay: 440ms;   /* 土 — soil rim */
+  --hero-drop-stage-delay: 640ms;  /* 樹 — tree + orbiters */
+  --hero-drop-bag-delay: 900ms;    /* 袋 — fertilizer bag */
+  --hero-drop-bag-end: calc(
+    var(--hero-drop-bag-delay) + var(--hero-drop-duration)
+  );
+}
+@keyframes hero-drop-in {
+  0%   { translate: 0 -240px; opacity: 0; }
+  55%  { translate: 0 14px;   opacity: 1; }
+  78%  { translate: 0 -6px; }
+  100% { translate: 0 0;      opacity: 1; }
+}
+.bonsai-stage,
+.bonsai-back-context,
+.bonsai-pot-rim,
+.bonsai-soil-flat,
+.soil-bag-host {
+  animation: hero-drop-in var(--hero-drop-duration)
+    cubic-bezier(0.34, 1.25, 0.64, 1) backwards;
+}
+/* Pot body and rim share the 盆 timing — the rim is the pot's lip,
+   conceptually part of the container. */
+.bonsai-back-context  { animation-delay: var(--hero-drop-back-delay); }
+.bonsai-pot-rim       { animation-delay: var(--hero-drop-back-delay); }
+.bonsai-soil-flat     { animation-delay: var(--hero-drop-soil-delay); }
+.bonsai-stage         { animation-delay: var(--hero-drop-stage-delay); }
+.soil-bag-host        { animation-delay: var(--hero-drop-bag-delay); }
+
+/* Returning visitors (skills already poured) skip the entrance — the
+   scene is already populated, replaying would feel sluggish. */
+:root[data-skills-poured]
+  :is(
+    .bonsai-stage,
+    .bonsai-back-context,
+    .bonsai-pot-rim,
+    .bonsai-soil-flat,
+    .soil-bag-host
+  ) {
+  animation: none;
+}
+
 /* Scroll-reveal: opt-in via class, set to revealed via IntersectionObserver */
 .reveal {
   opacity: 0;

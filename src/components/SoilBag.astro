@@ -277,6 +277,45 @@ const locale = getLocale(Astro.currentLocale);
     overflow: visible;
   }
 
+  /* Soft glowing halo around the sealed bag — entry-point cue. ::before
+     sits behind the SVG (z-index -1 inside the bag's local stacking
+     context). The two-stage animation waits for the bag's drop-in to
+     finish, fades in, then enters a slow breathing loop. Disappears as
+     soon as the bag leaves the sealed state. */
+  .soil-bag::before {
+    content: "";
+    position: absolute;
+    inset: -16%;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      color-mix(in oklch, var(--color-accent) 38%, transparent) 0%,
+      transparent 65%
+    );
+    filter: blur(18px);
+    opacity: 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+  /* Halo waits for the bag's drop-in to settle (var --hero-drop-bag-end
+     in global.css), fades in, then enters a slow breathing loop. */
+  .soil-bag[data-state="sealed"]::before {
+    animation:
+      bag-halo-in 700ms ease-out var(--hero-drop-bag-end) forwards,
+      bag-halo-breathe 3.2s ease-in-out
+        calc(var(--hero-drop-bag-end) + 700ms) infinite;
+  }
+  @keyframes bag-halo-in {
+    from { opacity: 0; transform: scale(0.82); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  /* 0%/100% match bag-halo-in's end state (opacity 1, scale 1) so the
+     handoff is seamless; the breath dips down to 0.78 at the midpoint. */
+  @keyframes bag-halo-breathe {
+    0%, 100% { opacity: 1;    transform: scale(1); }
+    50%      { opacity: 0.78; transform: scale(1.08); }
+  }
+
   /* --- Phase 1: cut animation (same as before) --- */
   .soil-bag-top {
     transform-origin: 110px 60px;

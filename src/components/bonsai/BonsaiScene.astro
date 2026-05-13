@@ -33,18 +33,34 @@ const treeLabel = `${treeRole} · ${treeCompany}`;
 ---
 
 <div class={`bonsai-perspective ${className}`}>
-  <!-- Three layers in DOM = paint order. The middle one is flat 2D
-       (unlike the 3D contexts above and below it) so the rim can be an
-       SVG inner stroke — uniform-width all the way around, which a
-       3D-tilted disc with a CSS border can't produce.
-         1. Pot (back, 3D, -20° tilt) — body trapezoid only
-         2. Soil + rim (mid, 2D screen plane)
-         3. Stage (front, 3D, -20° tilt) — tree + orbiters always on top -->
+  <!-- Four layers in DOM = paint order. The middle two are flat 2D
+       (unlike the 3D contexts above and below them) so the visible rim
+       band is uniform all the way around, which a 3D-tilted disc with a
+       CSS border can't produce.
+         1. Pot body  (back, 3D, -20° tilt) — trapezoid only
+         2. Pot rim   (mid, 2D) — solid clay ellipse
+         3. Soil      (mid, 2D) — smaller green ellipse on top of the rim
+         4. Stage     (front, 3D, -20° tilt) — tree + orbiters -->
   <div class="bonsai-back-context">
     <div class="bonsai-pot">
       <Pot class="block w-full" />
     </div>
   </div>
+
+  <!-- Pot rim — same flat 2D plane as the soil, but classified under the
+       pot family because it shares the pot's clay color and conceptually
+       belongs to the container. Solid filled ellipse: the soil sits on
+       top (slightly smaller) so the brown band visible around its edge
+       reads as the pot's rim. Rendered BEFORE the soil so the soil
+       paints on top. -->
+  <svg
+    class="bonsai-pot-rim"
+    viewBox="0 0 350 140"
+    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
+  >
+    <ellipse cx="175" cy="70" rx="175" ry="70" class="bonsai-pot-rim-fill" />
+  </svg>
 
   <svg
     class="bonsai-soil-flat"
@@ -52,25 +68,10 @@ const treeLabel = `${treeRole} · ${treeCompany}`;
     xmlns="http://www.w3.org/2000/svg"
     aria-hidden="true"
   >
-    <defs>
-      <clipPath id="bonsai-soil-clip">
-        <ellipse cx="175" cy="70" rx="175" ry="70" />
-      </clipPath>
-    </defs>
-    <!-- Filled green soil. -->
-    <ellipse cx="175" cy="70" rx="175" ry="70" class="bonsai-soil-fill" />
-    <!-- Same ellipse, stroked. Stroke is centered on the path; clipping
-         to the ellipse interior keeps only the inner half visible, so
-         the rim is a uniform 15 CSS px band sitting on the inside edge
-         of the soil. -->
-    <ellipse
-      cx="175"
-      cy="70"
-      rx="175"
-      ry="70"
-      class="bonsai-soil-rim"
-      clip-path="url(#bonsai-soil-clip)"
-    />
+    <!-- Filled green soil — sits on top of the pot rim, inset by 15 SVG
+         units in each axis so the band of rim visible around it
+         matches the original ~17 CSS px rim width. -->
+    <ellipse cx="175" cy="70" rx="160" ry="55" class="bonsai-soil-fill" />
   </svg>
 
   <div class="bonsai-stage" data-bonsai-rotator>
@@ -200,7 +201,7 @@ const treeLabel = `${treeRole} · ${treeCompany}`;
   }
 
   /* Pot — centered, no Z offset (sits on rotation axis). Body trapezoid
-     only; the visible rim lives on .bonsai-soil-flat above this layer.
+     only; the visible rim is the separate .bonsai-pot-rim layer below.
      Width is wider than the soil ellipse so the body's top corners get
      tucked under the soil and the silhouette flows from soil outline
      into body edge. Negative `bottom` pushes the body past the
@@ -216,27 +217,26 @@ const treeLabel = `${treeRole} · ${treeCompany}`;
     color: var(--bonsai-clay);
   }
 
-  /* Flat 2D soil + rim. Positioned the same way as the old 3D disc
-     (left: 50%; bottom: 21% with translate(-50%, 50%) centers on the
-     same point), so the tree and orbiters at bottom: 21% in the stage
-     context still appear to sit on it. Outer ellipse 350×140 (rx=175,
-     ry=70) is sized so the inner edge of the 15 CSS px stroke clears
-     the largest plant projection (r=155 → rx=155, ry=53). Fixed in px
-     because plant orbit radii are also fixed in px. */
-  .bonsai-soil-flat {
+  /* Flat 2D soil (.bonsai-soil-flat) and the matching pot rim
+     (.bonsai-pot-rim) share the same screen-space positioning so the
+     stroked ellipse aligns with the filled one. Positioned the same way
+     as the old 3D disc (left: 50%; bottom: 31% with translate(-50%, 50%)
+     centers on the same point), so the tree and orbiters at bottom: 21%
+     in the stage context still appear to sit on it. Outer ellipse
+     350×140 (rx=175, ry=70) is sized so the inner edge of the 15 CSS px
+     stroke clears the largest plant projection (r=155 → rx=155, ry=53).
+     Fixed in px because plant orbit radii are also fixed in px.
+
+     `bottom: 31%` lands the screen center on the pot body's post-tilt
+     top edge (the pot occupies the bottom ~31% of the container in
+     screen space). Width is scaled ×1.125 vs the viewBox to keep
+     proportional to the 720px-max container, then multiplied by
+     --bonsai-scale so the ellipse grows with the rest of the scene. */
+  .bonsai-soil-flat,
+  .bonsai-pot-rim {
     position: absolute;
     left: 50%;
-    /* `bottom: 31%` lands the soil's screen center on the pot body's
-       post-tilt top edge (the pot occupies the bottom ~31% of the
-       container in screen space). Was 21% when the container was
-       640×580; with the current 720×520 aspect the pot's top moved up
-       relative to the bottom, so this had to move with it. */
     bottom: 31%;
-    /* Scaled ×1.125 vs 350×140 to keep soil proportional to the
-       720px-max container; multiplied again by --bonsai-scale so the
-       ellipse grows with the rest of the scene. viewBox stays 350×140
-       so all ellipse coords and stroke-width stay valid and scale with
-       the CSS size. */
     width: calc(394px * var(--bonsai-scale));
     height: calc(158px * var(--bonsai-scale));
     transform: translate(-50%, 50%);
@@ -245,12 +245,8 @@ const treeLabel = `${treeRole} · ${treeCompany}`;
   .bonsai-soil-fill {
     fill: var(--bonsai-sage);
   }
-  .bonsai-soil-rim {
-    fill: none;
-    stroke: var(--bonsai-clay);
-    /* Stroke-width is doubled vs. the desired band width because the
-       clip-path only keeps the inner half visible. */
-    stroke-width: 30;
+  .bonsai-pot-rim-fill {
+    fill: var(--bonsai-clay);
   }
 
   /* Tree — centered, billboarded at orbit center. No orbit transform applied.
