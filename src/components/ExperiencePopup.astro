@@ -156,6 +156,12 @@ for (const project of projects) {
      visual. Padding stays at 0 so a click anywhere outside .bonsai-modal-card
      hits the dialog itself (used by the backdrop-click-to-close handler). */
   .bonsai-modal {
+    /* Native <dialog> centering via UA defaults can drift when `width` is
+       set explicitly; pin position + inset + margin so the card lands dead-
+       centre in every browser, regardless of content height. */
+    position: fixed;
+    inset: 0;
+    margin: auto;
     padding: 0;
     border: none;
     background: transparent;
@@ -163,6 +169,7 @@ for (const project of projects) {
     width: 100%;
     max-width: min(900px, calc(100vw - 2rem));
     max-height: calc(100vh - 2rem);
+    height: fit-content;
     border-radius: 18px;
     overflow: visible;
   }
