@@ -23,8 +23,6 @@ const decorations = [
   id="top"
   class="relative max-w-5xl mx-auto px-6 pt-20 pb-16 md:pt-32 md:pb-24 overflow-hidden"
 >
-  <div class="hero-bg" aria-hidden="true"></div>
-
   {
     decorations.map((d) => (
       <Decoration variant={d.variant} color={d.color} class={`deco ${d.class}`} />

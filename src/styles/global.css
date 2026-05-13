@@ -13,25 +13,30 @@
   /* Sidebar offset = left:8px + width:220px + gutter:~44px (xl+ only) */
   --spacing-sidebar: 17rem;
 
-  /* Warm cream background, royal-blue ink, orange accent */
+  /* Parchment background, sumi-ink text, cinnabar accent, tea-green secondary.
+     Hue note: every neutral now sits in the warm 40–80 band so the palette
+     reads as a single tonal family (no more cool royal-blue ink against the
+     warm cream). Accent/secondary keep their saturation to stay legible. */
   --color-bg: oklch(0.97 0.022 80);
-  --color-fg: oklch(0.28 0.12 265);
-  --color-muted: oklch(0.5 0.07 265);
+  --color-fg: oklch(0.25 0.03 50);
+  --color-muted: oklch(0.5 0.04 55);
   --color-subtle: oklch(0.93 0.04 75);
   --color-border: oklch(0.85 0.04 70);
-  /* Primary: vibrant orange */
-  --color-accent: oklch(0.66 0.21 38);
-  --color-accent-hover: oklch(0.58 0.22 35);
-  /* Secondary: royal blue */
-  --color-secondary: oklch(0.42 0.18 265);
-  --color-secondary-hover: oklch(0.36 0.19 265);
+  /* Primary: cinnabar / 朝霖 — red-shifted from the old vibrant orange so it
+     reads as a traditional red-pigment rather than a fluorescent accent. */
+  --color-accent: oklch(0.58 0.19 30);
+  --color-accent-hover: oklch(0.50 0.20 28);
+  /* Secondary: deep tea green / 茶綠 — replaces the cool royal blue. Keeps
+     the leaf-family hue (~145) so it sits alongside the bonsai foliage. */
+  --color-secondary: oklch(0.40 0.10 145);
+  --color-secondary-hover: oklch(0.34 0.11 145);
 }
 
 /* Bonsai palette lives outside @theme: most entries are only referenced via
    inline `var(--bonsai-${name})` in BonsaiScene.astro, which Tailwind v4 can't
    see — under @theme the unused ones get tree-shaken from :root, leaving the
-   plants to inherit `color` (the fg royal-blue) in light mode. A plain :root
-   rule emits all eight every time. */
+   plants to inherit `color` (the fg ink) in light mode. A plain :root rule
+   emits all eight every time. */
 :root {
   --bonsai-leaf:     oklch(0.42 0.12 145);
   --bonsai-sage:     oklch(0.70 0.08 135);
@@ -44,15 +49,18 @@
 }
 
 .dark {
-  --color-bg: oklch(0.2 0.06 265);
+  /* Dark mode mirrors the warm-tonal family: backgrounds drop into a deep
+     earth-brown rather than a navy, accents brighten into a softer cinnabar,
+     secondary into a brighter tea green. */
+  --color-bg: oklch(0.18 0.02 50);
   --color-fg: oklch(0.95 0.025 75);
-  --color-muted: oklch(0.72 0.04 75);
-  --color-subtle: oklch(0.27 0.07 265);
-  --color-border: oklch(0.36 0.07 265);
-  --color-accent: oklch(0.78 0.18 42);
-  --color-accent-hover: oklch(0.85 0.16 45);
-  --color-secondary: oklch(0.78 0.13 255);
-  --color-secondary-hover: oklch(0.85 0.11 255);
+  --color-muted: oklch(0.72 0.04 60);
+  --color-subtle: oklch(0.25 0.03 50);
+  --color-border: oklch(0.36 0.04 50);
+  --color-accent: oklch(0.70 0.17 35);
+  --color-accent-hover: oklch(0.78 0.15 38);
+  --color-secondary: oklch(0.72 0.08 145);
+  --color-secondary-hover: oklch(0.80 0.07 145);
 
   --bonsai-leaf:     oklch(0.55 0.12 145);
   --bonsai-sage:     oklch(0.78 0.08 135);
@@ -126,28 +134,7 @@ a {
   transition-delay: 80ms;
 }
 
-/* Hero background ambient gradient */
-.hero-bg {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: -1;
-  background:
-    radial-gradient(
-      55% 70% at 88% 8%,
-      color-mix(in oklch, var(--color-accent) 22%, transparent) 0%,
-      transparent 62%
-    ),
-    radial-gradient(
-      45% 60% at 4% 88%,
-      color-mix(in oklch, var(--color-secondary) 20%, transparent) 0%,
-      transparent 62%
-    );
-  mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
-}
-
-/* Display headings — pair the cream/orange palette with a characterful serif */
+/* Display headings — pair the warm-tonal palette with a characterful serif */
 .font-display {
   font-family: var(--font-serif);
   font-optical-sizing: auto;
@@ -206,13 +193,17 @@ a {
   right: 0;
   bottom: -0.35em;
   height: 0.45em;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 12' preserveAspectRatio='none'><path d='M2 8 Q 20 2 38 8 T 74 8 T 118 8' stroke='%23ed6a2a' stroke-width='2.5' fill='none' stroke-linecap='round'/></svg>");
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
+  /* SVG is shape-only (stroke is solid black) and used as a mask, so
+     `background-color: var(--color-accent)` is what actually paints — both
+     light and dark accents now follow the CSS variable automatically. */
+  background-color: var(--color-accent);
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 12' preserveAspectRatio='none'><path d='M2 8 Q 20 2 38 8 T 74 8 T 118 8' stroke='black' stroke-width='2.5' fill='none' stroke-linecap='round'/></svg>");
+          mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 12' preserveAspectRatio='none'><path d='M2 8 Q 20 2 38 8 T 74 8 T 118 8' stroke='black' stroke-width='2.5' fill='none' stroke-linecap='round'/></svg>");
+  -webkit-mask-repeat: no-repeat;
+          mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+          mask-size: 100% 100%;
   pointer-events: none;
-}
-.dark .title-underline::after {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 12' preserveAspectRatio='none'><path d='M2 8 Q 20 2 38 8 T 74 8 T 118 8' stroke='%23ffa46b' stroke-width='2.5' fill='none' stroke-linecap='round'/></svg>");
 }
 
 /* View Transitions: smoother default name animation for body */
