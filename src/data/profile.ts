@@ -1,6 +1,6 @@
 import { type Localized, tx } from "@/lib/i18n";
 
-export type Profile = {
+type Profile = {
   name: string;
   title: Localized;
   tagline: Localized;

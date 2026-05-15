@@ -21,7 +21,7 @@ export type ProjectImage = {
   href?: string;
 };
 
-export type Project = {
+type Project = {
   id: string;
   /** Links this project to an entry in experience.ts so it can appear in
    *  that role's bonsai popup. */

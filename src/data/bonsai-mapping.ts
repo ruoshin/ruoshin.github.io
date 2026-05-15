@@ -1,14 +1,6 @@
-export type BonsaiColor =
-  | "leaf"
-  | "sage"
-  | "mustard"
-  | "terra"
-  | "rose"
-  | "lavender"
-  | "teal"
-  | "clay";
+type BonsaiColor = "leaf" | "sage" | "mustard" | "terra" | "rose" | "lavender" | "teal" | "clay";
 
-export type BonsaiPlant = {
+type BonsaiPlant = {
   /** Matches an entry in experience.ts so a click can open that role's drawer. */
   experienceId: string;
   /** Angle in degrees around the pot's vertical axis, clockwise from front
@@ -27,15 +19,13 @@ export type BonsaiPlant = {
   color: BonsaiColor;
 };
 
-// Radii bound: each plant's screen-projected base must stay inside
-// the soil's inner ellipse (rx≈160 ry≈55, centered at screen y≈458).
-// BonsaiScene's `perspective: 1400px` pushes front-orbit plants (cos(θ)>0)
-// visibly further down on screen than the plain sin(20°) projection
-// would suggest — so the binding rule at the front is r·cos(θ) ≲ 117
-// (mirror: r·cos(θ) ≳ -127 at the back). Lateral constraint at
-// θ≈90°/270° is much looser; the plant body half-width (plant ~19px
-// at 6% of 640, kinoko ~26px at 8%, flower ~16px at 5%, scaled by
-// `scale`) is rarely binding.
+// Radii bound: each plant's screen-projected base must stay inside the
+// soil's inner ellipse. BonsaiScene's `perspective: 1400px` pushes
+// front-orbit plants (cos(θ)>0) visibly further down on screen than the
+// plain sin(20°) projection would suggest — so the binding rule at the
+// front is r·cos(θ) ≲ 117 (mirror: r·cos(θ) ≳ -127 at the back). The
+// lateral constraint at θ≈90°/270° is much looser and has never been
+// binding in practice.
 export const bonsaiPlants: BonsaiPlant[] = [
   { experienceId: "vocus", angle: 322, radius: 95, scale: 0.85, tilt: 0, color: "teal" },
   { experienceId: "infocast", angle: 55, radius: 125, scale: 1.0, tilt: 0, color: "mustard" },
@@ -47,9 +37,9 @@ export const bonsaiPlants: BonsaiPlant[] = [
 export const bonsaiTreeExperienceId = "actuaviz";
 
 /** Decorative orbiters — no experience linkage, just visual fill. */
-export type BonsaiDecorationKind = "kinoko" | "flower";
+type BonsaiDecorationKind = "kinoko" | "flower";
 
-export type BonsaiDecoration = {
+type BonsaiDecoration = {
   kind: BonsaiDecorationKind;
   angle: number;
   radius: number;
