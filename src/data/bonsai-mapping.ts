@@ -14,7 +14,10 @@ export type BonsaiPlant = {
   /** Angle in degrees around the pot's vertical axis, clockwise from front
    *  (camera-facing side). 0 = front, 90 = right, 180 = back, 270 = left. */
   angle: number;
-  /** Orbital radius in stage-local px. Inner ring ~60–90, outer ring ~120–160. */
+  /** Orbital radius in stage-local px. Scatter across ~60–125 with every
+   *  orbiter at a unique value, picking one far from each neighbour's so
+   *  adjacent angles don't land on the same ring (uniform radii read as a
+   *  halo around the tree, not a scatter). */
   radius: number;
   /** Visual scale variation (0.7–1.1) so the scatter doesn't read as uniform. */
   scale: number;
@@ -34,8 +37,8 @@ export type BonsaiPlant = {
 // at 6% of 640, kinoko ~26px at 8%, flower ~16px at 5%, scaled by
 // `scale`) is rarely binding.
 export const bonsaiPlants: BonsaiPlant[] = [
-  { experienceId: "vocus", angle: 315, radius: 73, scale: 0.85, tilt: 6, color: "teal" },
-  { experienceId: "infocast", angle: 45, radius: 135, scale: 1.0, tilt: -5, color: "mustard" },
+  { experienceId: "vocus", angle: 322, radius: 95, scale: 0.85, tilt: 0, color: "teal" },
+  { experienceId: "infocast", angle: 55, radius: 125, scale: 1.0, tilt: 0, color: "mustard" },
 ];
 
 /** The central tree represents the "main" experience — typically the most
@@ -55,18 +58,26 @@ export type BonsaiDecoration = {
   color: BonsaiColor;
 };
 
+// Deliberately non-uniform angular spacing — even ≥20° gaps everywhere were
+// reading as a ring outline regardless of radius variation. Now there are
+// dense clusters (5°-38°, 80°-95°, 155°-195°) and obvious empty bands
+// (95°-130° spans 35°; 290°-vocus-5° spans ~75° broken only by vocus at
+// 322°), so the scatter no longer traces a single circular path.
+// Radii are unique per orbiter (incl. plants above) across 60–125, with
+// every adjacent pair differing by ≥25 so no two close-angle items ever
+// share a ring.
 export const bonsaiDecorations: BonsaiDecoration[] = [
-  { kind: "kinoko", angle: 55, radius: 84, scale: 0.7, tilt: -8, color: "lavender" },
-  { kind: "kinoko", angle: 130, radius: 124, scale: 0.55, tilt: 5, color: "rose" },
-  { kind: "kinoko", angle: 200, radius: 130, scale: 0.65, tilt: 12, color: "terra" },
-  { kind: "kinoko", angle: 275, radius: 68, scale: 0.8, tilt: -6, color: "teal" },
-  { kind: "kinoko", angle: 340, radius: 113, scale: 0.6, tilt: 9, color: "mustard" },
-  { kind: "flower", angle: 30, radius: 96, scale: 0.7, tilt: -5, color: "rose" },
-  { kind: "flower", angle: 110, radius: 56, scale: 0.8, tilt: 8, color: "mustard" },
-  { kind: "flower", angle: 195, radius: 118, scale: 0.65, tilt: -10, color: "terra" },
-  { kind: "flower", angle: 160, radius: 96, scale: 0.75, tilt: 12, color: "teal" },
-  { kind: "flower", angle: 39, radius: 135, scale: 0.55, tilt: 8, color: "lavender" },
-  { kind: "flower", angle: 75, radius: 113, scale: 0.75, tilt: -10, color: "teal" },
-  { kind: "flower", angle: 225, radius: 107, scale: 0.7, tilt: 3, color: "terra" },
-  { kind: "flower", angle: 325, radius: 130, scale: 0.6, tilt: -6, color: "teal" },
+  { kind: "flower", angle: 5, radius: 70, scale: 0.65, tilt: 0, color: "rose" },
+  { kind: "kinoko", angle: 22, radius: 115, scale: 0.7, tilt: 0, color: "lavender" },
+  { kind: "flower", angle: 38, radius: 60, scale: 0.5, tilt: 0, color: "mustard" },
+  { kind: "flower", angle: 80, radius: 80, scale: 0.8, tilt: 0, color: "teal" },
+  { kind: "kinoko", angle: 95, radius: 105, scale: 0.6, tilt: 0, color: "terra" },
+  { kind: "flower", angle: 130, radius: 65, scale: 0.55, tilt: 0, color: "rose" },
+  { kind: "kinoko", angle: 155, radius: 110, scale: 0.7, tilt: 0, color: "lavender" },
+  { kind: "flower", angle: 175, radius: 75, scale: 0.6, tilt: 0, color: "mustard" },
+  { kind: "flower", angle: 195, radius: 122, scale: 0.75, tilt: 0, color: "terra" },
+  { kind: "kinoko", angle: 222, radius: 85, scale: 0.55, tilt: 0, color: "rose" },
+  { kind: "flower", angle: 248, radius: 118, scale: 0.7, tilt: 0, color: "lavender" },
+  { kind: "kinoko", angle: 270, radius: 90, scale: 0.65, tilt: 0, color: "teal" },
+  { kind: "flower", angle: 290, radius: 120, scale: 0.8, tilt: 0, color: "terra" },
 ];
