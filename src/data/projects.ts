@@ -1,4 +1,9 @@
 import type { ImageMetadata } from "astro";
+import actuaworks01 from "@/assets/images/actuaworks01.png";
+import actuaworks02 from "@/assets/images/actuaworks02.png";
+import actuaworks03 from "@/assets/images/actuaworks03.png";
+import dataBridge01 from "@/assets/images/data-bridge01.png";
+import dataBridge02 from "@/assets/images/data-bridge02.png";
 import reportTool01 from "@/assets/images/reporttool01.png";
 import reportTool02 from "@/assets/images/reporttool02.png";
 import reportTool03 from "@/assets/images/reporttool03.png";
@@ -30,6 +35,35 @@ export type Project = {
 };
 
 export const projects: Project[] = [
+  {
+    id: "actuaworks",
+    experienceId: "actuaviz",
+    name: "ActuaWorks",
+    client: tx("ActuaViz / 精算軟體", "ActuaViz / Actuarial software"),
+    summary: tx(
+      "精算軟體前端，與精算師、產品端協作釐清 data model，從 Figma 可行性討論到介面實作與迭代。",
+      "Frontend for the actuarial platform — aligning the underlying data model with actuaries and product, then carrying designs from Figma feasibility review through pixel-faithful implementation.",
+    ),
+    images: [
+      { src: actuaworks01, alt: tx("ActuaWorks 介面截圖一", "ActuaWorks UI screenshot 1") },
+      { src: actuaworks02, alt: tx("ActuaWorks 介面截圖二", "ActuaWorks UI screenshot 2") },
+      { src: actuaworks03, alt: tx("ActuaWorks 介面截圖三", "ActuaWorks UI screenshot 3") },
+    ],
+  },
+  {
+    id: "data-bridge",
+    experienceId: "actuaviz",
+    name: "Data Bridge",
+    client: tx("ActuaViz / 精算後台", "ActuaViz / Actuarial backend"),
+    summary: tx(
+      "精算後台系統，規劃功能流程並負責 UI/UX 設計與前端實作。",
+      "Actuarial backend system — owned the flow design plus UI/UX and the frontend implementation.",
+    ),
+    images: [
+      { src: dataBridge01, alt: tx("Data Bridge 介面截圖一", "Data Bridge UI screenshot 1") },
+      { src: dataBridge02, alt: tx("Data Bridge 介面截圖二", "Data Bridge UI screenshot 2") },
+    ],
+  },
   {
     id: "vocus",
     experienceId: "vocus",

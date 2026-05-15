@@ -386,13 +386,8 @@ for (const project of projects) {
   .bonsai-modal-project-grid {
     margin-top: 0.85rem;
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.65rem;
-  }
-  @media (min-width: 640px) {
-    .bonsai-modal-project-grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
   }
 
   @media (prefers-reduced-motion: no-preference) {
