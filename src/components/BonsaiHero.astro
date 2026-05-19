@@ -144,6 +144,14 @@ const aboutFacets = aboutFacetsByLocale[locale];
     max-width: 180px;
     margin: 0 auto;
   }
+  @media (max-width: 767px) {
+    .bag-slot {
+      display: none;
+    }
+    .skills-chip {
+      opacity: 1;
+    }
+  }
   @media (min-width: 768px) {
     .bag-skills {
       grid-template-columns: 1fr var(--bag-desktop-width);

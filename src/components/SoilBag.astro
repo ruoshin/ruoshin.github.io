@@ -238,14 +238,9 @@ const locale = getLocale(Astro.currentLocale);
     outline: none;
     user-select: none;
     -webkit-user-select: none;
-    /* Suppress iOS long-press callout (image save / text selection menu)
-       so dragging the bag never spawns a system menu. */
     -webkit-touch-callout: none;
-    /* While sealed the user still needs to scroll the page past the bag —
-       allow vertical pan, capture horizontal for the cut swipe. Other
-       states override this below: once the bag is a draggable prop it has
-       to claim every direction, otherwise vertical drags get stolen by
-       page scroll and feel like the bag is "stuck". */
+    /* Sealed allows page scroll past the bag; state rules below switch to
+       `none` so dragging the opened bag isn't stolen by vertical scroll. */
     touch-action: pan-y;
     --cut-progress: 0;
     --bag-dx: 0px;
@@ -264,9 +259,6 @@ const locale = getLocale(Astro.currentLocale);
   }
   .soil-bag[data-state="opened"] {
     cursor: grab;
-    /* Once opened the bag is a free-drag prop — take over all touch
-       gestures so vertical drags reach the skills grid below instead of
-       being interpreted as a page scroll. */
     touch-action: none;
   }
   .soil-bag[data-state="holding"],
@@ -280,9 +272,7 @@ const locale = getLocale(Astro.currentLocale);
     touch-action: none;
     opacity: 0.85;
   }
-  /* SVG text inside the bag inherits user-select but iOS Safari has been
-     known to honour it inconsistently for <text>; pin it explicitly so a
-     tap-and-hold on the "SKILLS" label can never start a selection. */
+  /* iOS Safari doesn't always honour user-select: none on SVG <text>. */
   .soil-bag-svg text {
     user-select: none;
     -webkit-user-select: none;
@@ -475,7 +465,7 @@ const locale = getLocale(Astro.currentLocale);
   // ------------------------------------------------------------------
 
   const CUT_THRESHOLD_PX = 110;
-  const TILT_THRESHOLD_DEG = -30;
+  const TILT_THRESHOLD_DEG = -18;
   const EMIT_INTERVAL_MS = 95;
   const GRAVITY_PX_S2 = 1600;
   // Drag clamps are asymmetric: the bag starts on the right side of the
@@ -818,7 +808,7 @@ const locale = getLocale(Astro.currentLocale);
       // Rotation candidate from horizontal pointer delta. Locked once
       // tilting; otherwise follows the drag with a steeper response so the
       // pouring pose reads more clearly without requiring a huge drag.
-      const candidate = Math.max(-120, Math.min(15, rawDx * 0.75));
+      const candidate = Math.max(-120, Math.min(15, rawDx * 1.1));
       let rot: number;
       if (bag.dataset.state === "tilting") {
         // Allow deeper tilt, never lighter. lockedRot stores the deepest

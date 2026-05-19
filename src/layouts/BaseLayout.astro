@@ -63,12 +63,14 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
     </script>
 
     <script is:inline>
-      // Returning visitors who've already poured all skills should see the
-      // full bonsai (all plants + decorations) immediately. Pre-paint so the
-      // initially-hidden orbiter CSS doesn't flash on revisit.
+      // Pre-paint the bloomed state for returning visitors and on mobile
+      // (where the pour interaction is hidden), so the orbiter CSS doesn't
+      // flash an empty bonsai on first paint.
       (function () {
         try {
-          if (localStorage.getItem("skills-bag-emptied") === "1") {
+          const emptied = localStorage.getItem("skills-bag-emptied") === "1";
+          const isMobile = window.matchMedia("(max-width: 767px)").matches;
+          if (emptied || isMobile) {
             document.documentElement.setAttribute("data-skills-poured", "");
           }
         } catch {}
