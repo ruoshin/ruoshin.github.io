@@ -237,6 +237,15 @@ const locale = getLocale(Astro.currentLocale);
     cursor: ew-resize;
     outline: none;
     user-select: none;
+    -webkit-user-select: none;
+    /* Suppress iOS long-press callout (image save / text selection menu)
+       so dragging the bag never spawns a system menu. */
+    -webkit-touch-callout: none;
+    /* While sealed the user still needs to scroll the page past the bag —
+       allow vertical pan, capture horizontal for the cut swipe. Other
+       states override this below: once the bag is a draggable prop it has
+       to claim every direction, otherwise vertical drags get stolen by
+       page scroll and feel like the bag is "stuck". */
     touch-action: pan-y;
     --cut-progress: 0;
     --bag-dx: 0px;
@@ -255,15 +264,28 @@ const locale = getLocale(Astro.currentLocale);
   }
   .soil-bag[data-state="opened"] {
     cursor: grab;
+    /* Once opened the bag is a free-drag prop — take over all touch
+       gestures so vertical drags reach the skills grid below instead of
+       being interpreted as a page scroll. */
+    touch-action: none;
   }
   .soil-bag[data-state="holding"],
   .soil-bag[data-state="tilting"] {
     cursor: grabbing;
+    touch-action: none;
     z-index: 50;
   }
   .soil-bag[data-state="empty"] {
     cursor: grab;
+    touch-action: none;
     opacity: 0.85;
+  }
+  /* SVG text inside the bag inherits user-select but iOS Safari has been
+     known to honour it inconsistently for <text>; pin it explicitly so a
+     tap-and-hold on the "SKILLS" label can never start a selection. */
+  .soil-bag-svg text {
+    user-select: none;
+    -webkit-user-select: none;
   }
   .soil-bag:focus-visible {
     outline: 2px solid var(--color-accent);
