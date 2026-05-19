@@ -8,11 +8,12 @@ import {
   bonsaiPlants,
   bonsaiDecorations,
   bonsaiTreeExperienceId,
+  bonsaiTreeColor,
 } from "@/data/bonsai-mapping";
 import { experience } from "@/data/experience";
 import { getLocale } from "@/lib/i18n";
 
-const decorationGlyphs = { kinoko: Kinoko, flower: Flower } as const;
+const orbiterGlyphs = { plant: Plant, kinoko: Kinoko, flower: Flower } as const;
 
 interface Props {
   class?: string;
@@ -79,11 +80,12 @@ const treeLabel = `${treeRole} · ${treeCompany}`;
          "main" experience (bonsaiTreeExperienceId) — same click contract as
          the plant orbiters via [data-experience-id]. -->
     <div
-      class="bonsai-tree"
+      class="bonsai-tree bonsai-clickable"
       data-experience-id={bonsaiTreeExperienceId}
       role="button"
       tabindex="0"
       aria-label={treeLabel}
+      style={`color: ${bonsaiTreeColor};`}
     >
       <Tree class="block w-full" />
       <span class="bonsai-label bonsai-tree-label" aria-hidden="true">
@@ -108,17 +110,19 @@ const treeLabel = `${treeRole} · ${treeCompany}`;
         const role = job.role[locale];
         const company = job.shortName?.[locale] ?? job.company;
         const label = `${role} · ${company}`;
+        const kind = p.kind ?? "plant";
+        const Glyph = orbiterGlyphs[kind];
         return (
           <div
-            class="bonsai-orbiter bonsai-plant"
+            class={`bonsai-orbiter bonsai-clickable bonsai-${kind}`}
             data-experience-id={p.experienceId}
             role="button"
             tabindex="0"
             aria-label={label}
-            style={`color: var(--bonsai-${p.color}); --theta: ${p.angle}deg; --r: ${p.radius}px; --tilt: ${p.tilt}deg; --scale: ${p.scale};`}
+            style={`color: ${p.color}; --theta: ${p.angle}deg; --r: ${p.radius}px; --tilt: ${p.tilt}deg; --scale: ${p.scale};`}
           >
-            <Plant class="block w-full" />
-            <span class="bonsai-label bonsai-plant-label" aria-hidden="true">
+            <Glyph class="block w-full" />
+            <span class="bonsai-label bonsai-orbiter-label" aria-hidden="true">
               <span>{role}</span>
               <span class="bonsai-label-sep">·</span>
               <span class="bonsai-label-company">{company}</span>
@@ -132,11 +136,11 @@ const treeLabel = `${treeRole} · ${treeCompany}`;
          smaller footprint than branches. Glyph dispatched by `kind`. -->
     {
       bonsaiDecorations.map((d) => {
-        const Glyph = decorationGlyphs[d.kind];
+        const Glyph = orbiterGlyphs[d.kind];
         return (
           <div
             class={`bonsai-orbiter bonsai-${d.kind}`}
-            style={`color: var(--bonsai-${d.color}); --theta: ${d.angle}deg; --r: ${d.radius}px; --tilt: ${d.tilt}deg; --scale: ${d.scale};`}
+            style={`color: ${d.color}; --theta: ${d.angle}deg; --r: ${d.radius}px; --tilt: ${d.tilt}deg; --scale: ${d.scale};`}
           >
             <Glyph class="block w-full" />
           </div>
@@ -250,20 +254,18 @@ const treeLabel = `${treeRole} · ${treeCompany}`;
   }
 
   /* Tree — centered, billboarded at orbit center. No orbit transform applied.
-     Also acts as a button for the "main" experience; cursor and focus styling
-     mirror .bonsai-plant. */
+     Also acts as a button (it carries .bonsai-clickable). Color is set
+     inline from bonsaiTreeColor in the data module. */
   .bonsai-tree {
     position: absolute;
     left: 50%;
     bottom: 31%;
-    width: 32%;
+    /* SVG aspect is 64/139, so on-screen height ≈ width × 2.17. Tune
+       width to set the tree's vertical footprint. */
+    width: 15%;
     transform: translate3d(-50%, 0, 0);
-    color: var(--bonsai-leaf);
-    cursor: pointer;
-    outline: none;
   }
   .bonsai-tree:focus-visible {
-    outline: 2px solid var(--color-accent);
     outline-offset: 6px;
     border-radius: 6px;
   }
@@ -391,22 +393,24 @@ const treeLabel = `${treeRole} · ${treeCompany}`;
     height: auto;
   }
 
-  /* Plant orbiters act as buttons. The visible focus ring uses the parent's
-     bounding box, which sits at the plant's bottom-center after the orbit
-     transform — readable enough without fighting the 3D chain. */
-  .bonsai-plant {
+  /* Clickable orbiters (experience plants) and the tree both act as buttons.
+     The visible focus ring uses the element's bounding box, which for an
+     orbiter sits at its bottom-center after the orbit transform — readable
+     enough without fighting the 3D chain. Tree-specific offset/radius live
+     on .bonsai-tree:focus-visible above. */
+  .bonsai-clickable {
     cursor: pointer;
     outline: none;
   }
-  .bonsai-plant:focus-visible {
+  .bonsai-clickable:focus-visible {
     outline: 2px solid var(--color-accent);
     outline-offset: 4px;
     border-radius: 4px;
   }
 
-  /* Shared label pill — used by both plants and the tree as a hover/focus
-     tooltip. Per-variant transform overrides live in .bonsai-plant-label /
-     .bonsai-tree-label below. */
+  /* Shared label pill — used by clickable orbiters and the tree as a
+     hover/focus tooltip. Per-variant transform overrides live in
+     .bonsai-orbiter-label / .bonsai-tree-label below. */
   .bonsai-label {
     position: absolute;
     bottom: calc(100% + 6px);
@@ -434,12 +438,12 @@ const treeLabel = `${treeRole} · ${treeCompany}`;
     color: var(--color-muted);
   }
 
-  /* Plant variant — the orbiter applies rotate(tilt) then scale(s) last in
+  /* Orbiter variant — the orbiter applies rotate(tilt) then scale(s) last in
      its transform chain, so cancelling those two leaves the label billboarded,
-     upright, and at a constant readable size across plants. transform-origin
-     pins the bottom-center to the plant top so scale grows the label upward,
+     upright, and at a constant readable size across orbiters. transform-origin
+     pins the bottom-center to the orbiter top so scale grows the label upward,
      away from the silhouette. */
-  .bonsai-plant-label {
+  .bonsai-orbiter-label {
     transform:
       translateX(-50%)
       rotate(calc(-1 * var(--tilt, 0deg)))
@@ -456,13 +460,11 @@ const treeLabel = `${treeRole} · ${treeCompany}`;
   /* Hover-driven reveal is gated to pointer-capable devices so iOS doesn't
      leave the label stuck on after a tap. Keyboard focus always reveals. */
   @media (hover: hover) {
-    .bonsai-plant:hover .bonsai-label,
-    .bonsai-tree:hover .bonsai-label {
+    .bonsai-clickable:hover .bonsai-label {
       opacity: 1;
     }
   }
-  .bonsai-plant:focus-visible .bonsai-label,
-  .bonsai-tree:focus-visible .bonsai-label {
+  .bonsai-clickable:focus-visible .bonsai-label {
     opacity: 1;
   }
 
@@ -657,11 +659,11 @@ const treeLabel = `${treeRole} · ${treeCompany}`;
     // Experience plants render first so the meaningful orbiters emerge
     // ahead of decorative filler. Order within each kind preserved.
     const plants = Array.from(
-      stage.querySelectorAll<HTMLElement>(".bonsai-plant"),
+      stage.querySelectorAll<HTMLElement>(".bonsai-orbiter.bonsai-clickable"),
     );
     const decorations = Array.from(
       stage.querySelectorAll<HTMLElement>(
-        ".bonsai-orbiter:not(.bonsai-plant)",
+        ".bonsai-orbiter:not(.bonsai-clickable)",
       ),
     );
     const orbiters = [...plants, ...decorations];

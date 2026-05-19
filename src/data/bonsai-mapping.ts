@@ -1,4 +1,6 @@
-type BonsaiColor = "leaf" | "sage" | "mustard" | "terra" | "rose" | "lavender" | "teal" | "clay";
+/** Glyph used for any orbiter (experience plant or decoration). The kind
+ *  also picks the per-glyph width rule in BonsaiScene's CSS. */
+type BonsaiOrbiterKind = "plant" | "kinoko" | "flower";
 
 type BonsaiPlant = {
   /** Matches an entry in experience.ts so a click can open that role's drawer. */
@@ -15,8 +17,14 @@ type BonsaiPlant = {
   scale: number;
   /** In-plane (screen-Z) tilt in degrees for organic lean. */
   tilt: number;
-  /** Palette key — resolves to var(--bonsai-<color>) at render. */
-  color: BonsaiColor;
+  /** Any CSS color string — applied as `color:` on the orbiter so the SVG's
+   *  currentColor picks it up. Clickable orbiters use vivid brand hexes;
+   *  decorations use desaturated hexes so the eye is pulled to the
+   *  experience plants and tree first. */
+  color: string;
+  /** Glyph used for the orbiter. Defaults to "plant"; swap when a role
+   *  reads better as a different silhouette. */
+  kind?: BonsaiOrbiterKind;
 };
 
 // Radii bound: each plant's screen-projected base must stay inside the
@@ -27,8 +35,16 @@ type BonsaiPlant = {
 // lateral constraint at θ≈90°/270° is much looser and has never been
 // binding in practice.
 export const bonsaiPlants: BonsaiPlant[] = [
-  { experienceId: "vocus", angle: 322, radius: 95, scale: 0.85, tilt: 0, color: "teal" },
-  { experienceId: "infocast", angle: 55, radius: 125, scale: 1.0, tilt: 0, color: "mustard" },
+  {
+    experienceId: "vocus",
+    angle: 322,
+    radius: 95,
+    scale: 0.85,
+    tilt: 0,
+    color: "#ff485a",
+    kind: "kinoko",
+  },
+  { experienceId: "infocast", angle: 55, radius: 125, scale: 1.0, tilt: 0, color: "#2eb7e6" },
 ];
 
 /** The central tree represents the "main" experience — typically the most
@@ -36,16 +52,18 @@ export const bonsaiPlants: BonsaiPlant[] = [
  *  the orbiting plants do. */
 export const bonsaiTreeExperienceId = "actuaviz";
 
-/** Decorative orbiters — no experience linkage, just visual fill. */
-type BonsaiDecorationKind = "kinoko" | "flower";
+/** Tree color — applied inline on the tree element; the SVG fills with
+ *  currentColor so any CSS color value works here. */
+export const bonsaiTreeColor = "#407e9f";
 
+/** Decorative orbiters — no experience linkage, just visual fill. */
 type BonsaiDecoration = {
-  kind: BonsaiDecorationKind;
+  kind: BonsaiOrbiterKind;
   angle: number;
   radius: number;
   scale: number;
   tilt: number;
-  color: BonsaiColor;
+  color: string;
 };
 
 // Deliberately non-uniform angular spacing — even ≥20° gaps everywhere were
@@ -56,18 +74,21 @@ type BonsaiDecoration = {
 // Radii are unique per orbiter (incl. plants above) across 60–125, with
 // every adjacent pair differing by ≥25 so no two close-angle items ever
 // share a ring.
+// Colors are deliberately low-chroma so the only saturated spots in the
+// scene are the experience plants (vocus/infocast) and the central tree —
+// the visual hierarchy reads "click these" without any extra affordance.
 export const bonsaiDecorations: BonsaiDecoration[] = [
-  { kind: "flower", angle: 5, radius: 70, scale: 0.65, tilt: 0, color: "rose" },
-  { kind: "kinoko", angle: 22, radius: 115, scale: 0.7, tilt: 0, color: "lavender" },
-  { kind: "flower", angle: 38, radius: 60, scale: 0.5, tilt: 0, color: "mustard" },
-  { kind: "flower", angle: 80, radius: 80, scale: 0.8, tilt: 0, color: "teal" },
-  { kind: "kinoko", angle: 95, radius: 105, scale: 0.6, tilt: 0, color: "terra" },
-  { kind: "flower", angle: 130, radius: 65, scale: 0.55, tilt: 0, color: "rose" },
-  { kind: "kinoko", angle: 155, radius: 110, scale: 0.7, tilt: 0, color: "lavender" },
-  { kind: "flower", angle: 175, radius: 75, scale: 0.6, tilt: 0, color: "mustard" },
-  { kind: "flower", angle: 195, radius: 122, scale: 0.75, tilt: 0, color: "terra" },
-  { kind: "kinoko", angle: 222, radius: 85, scale: 0.55, tilt: 0, color: "rose" },
-  { kind: "flower", angle: 248, radius: 118, scale: 0.7, tilt: 0, color: "lavender" },
-  { kind: "kinoko", angle: 270, radius: 90, scale: 0.65, tilt: 0, color: "teal" },
-  { kind: "flower", angle: 290, radius: 120, scale: 0.8, tilt: 0, color: "terra" },
+  { kind: "flower", angle: 5, radius: 70, scale: 0.65, tilt: 0, color: "#ac7575" },
+  { kind: "kinoko", angle: 22, radius: 115, scale: 0.7, tilt: 0, color: "#807ba5" },
+  { kind: "flower", angle: 38, radius: 60, scale: 0.5, tilt: 0, color: "#93854f" },
+  { kind: "flower", angle: 80, radius: 80, scale: 0.8, tilt: 0, color: "#698f8c" },
+  { kind: "kinoko", angle: 95, radius: 105, scale: 0.6, tilt: 0, color: "#ae7d61" },
+  { kind: "flower", angle: 130, radius: 65, scale: 0.55, tilt: 0, color: "#ac7575" },
+  { kind: "kinoko", angle: 155, radius: 110, scale: 0.7, tilt: 0, color: "#807ba5" },
+  { kind: "flower", angle: 175, radius: 75, scale: 0.6, tilt: 0, color: "#93854f" },
+  { kind: "plant", angle: 195, radius: 122, scale: 0.75, tilt: 0, color: "#ae7d61" },
+  { kind: "kinoko", angle: 222, radius: 85, scale: 0.55, tilt: 0, color: "#ac7575" },
+  { kind: "flower", angle: 248, radius: 118, scale: 0.7, tilt: 0, color: "#807ba5" },
+  { kind: "kinoko", angle: 270, radius: 90, scale: 0.65, tilt: 0, color: "#698f8c" },
+  { kind: "flower", angle: 290, radius: 120, scale: 0.8, tilt: 0, color: "#ae7d61" },
 ];
