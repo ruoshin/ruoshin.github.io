@@ -106,22 +106,19 @@ export const ui = {
   },
 } satisfies Record<string, Localized>;
 
-/** About-page facets surfaced under the bonsai. Bundled as a single
- *  Localized array (rather than six separate `Localized<string>` keys
- *  under `ui`) so the consuming component just iterates `[locale]`. */
 export const aboutFacetsByLocale: Localized<{ title: string; body: string }[]> = {
   "zh-Hant": [
     {
       title: "Frontend",
-      body: "十年以上 React 與現代前端工具鏈經驗，從產品架構到細節互動都能掌握。",
+      body: "十年以上 React 與現代前端工具經驗，從產品架構到細節互動都能掌握。",
     },
     {
       title: "Backend-aware",
-      body: "曾任 PHP 後端工程師，能與後端工程師有效對話、共同設計 API 與資料流。",
+      body: "曾任 PHP 後端工程師，能與後端工程師有效對話、共同設計 API 與資料流，減少在跨部門間溝通上的誤差。",
     },
     {
       title: "Design-aware",
-      body: "前端設計背景出身，熟悉 Figma 與設計協作流程，能還原並提出可行性建議。",
+      body: "熟悉 Figma 與設計協作流程，能還原並提出可行性建議。",
     },
   ],
   en: [
@@ -135,7 +132,7 @@ export const aboutFacetsByLocale: Localized<{ title: string; body: string }[]> =
     },
     {
       title: "Design-aware",
-      body: "Frontend designer background — fluent in Figma and design handoff, able to translate intent and surface tradeoffs.",
+      body: "Fluent in Figma and design handoff, able to translate intent and surface tradeoffs.",
     },
   ],
 };
