@@ -51,29 +51,36 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
     <ClientRouter />
 
     <script is:inline>
-      // Set theme before paint to avoid FOUC
+      // ClientRouter wipes <html> attributes on locale switch — re-apply theme + skills-poured here.
       (function () {
-        const saved = localStorage.getItem("theme");
-        const prefersDark = window.matchMedia(
-          "(prefers-color-scheme: dark)",
-        ).matches;
-        const theme = saved ?? (prefersDark ? "dark" : "light");
-        if (theme === "dark") document.documentElement.classList.add("dark");
-      })();
-    </script>
+        function applyPrePaintState() {
+          try {
+            const saved = localStorage.getItem("theme");
+            const prefersDark = window.matchMedia(
+              "(prefers-color-scheme: dark)",
+            ).matches;
+            const theme = saved ?? (prefersDark ? "dark" : "light");
+            document.documentElement.classList.toggle(
+              "dark",
+              theme === "dark",
+            );
 
-    <script is:inline>
-      // Pre-paint the bloomed state for returning visitors and on mobile
-      // (where the pour interaction is hidden), so the orbiter CSS doesn't
-      // flash an empty bonsai on first paint.
-      (function () {
-        try {
-          const emptied = localStorage.getItem("skills-bag-emptied") === "1";
-          const isMobile = window.matchMedia("(max-width: 767px)").matches;
-          if (emptied || isMobile) {
-            document.documentElement.setAttribute("data-skills-poured", "");
-          }
-        } catch {}
+            const emptied =
+              localStorage.getItem("skills-bag-emptied") === "1";
+            const isMobile = window.matchMedia(
+              "(max-width: 767px)",
+            ).matches;
+            document.documentElement.toggleAttribute(
+              "data-skills-poured",
+              emptied || isMobile,
+            );
+          } catch (_e) {}
+        }
+        applyPrePaintState();
+        if (!document.__prePaintBound) {
+          document.__prePaintBound = true;
+          document.addEventListener("astro:after-swap", applyPrePaintState);
+        }
       })();
     </script>
   </head>

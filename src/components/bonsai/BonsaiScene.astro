@@ -312,9 +312,8 @@ const treeLabel = `${treeRole} · ${treeCompany}`;
     scale: var(--scale, 1);
     pointer-events: auto;
   }
-  /* Returning visitors skip the emergence transition entirely — orbiters
-     are fully grown from first paint. */
-  :root[data-skills-poured] .bonsai-orbiter {
+  :root[data-skills-poured] .bonsai-orbiter,
+  .bonsai-perspective[data-restored] .bonsai-orbiter {
     transition: none;
   }
   @media (prefers-reduced-motion: reduce) {
@@ -476,6 +475,7 @@ const treeLabel = `${treeRole} · ${treeCompany}`;
 
 <script>
   import { gsap } from "gsap";
+  import { readEmittedCount } from "@/lib/skills-storage";
 
   const SPIN_DURATION_SEC = 60; // seconds per full revolution
   const DEG_PER_PX = 0.4; // horizontal drag sensitivity
@@ -673,16 +673,33 @@ const treeLabel = `${treeRole} · ${treeCompany}`;
     const orbiters = [...plants, ...decorations];
     if (orbiters.length === 0) return;
 
-    // The visible state is driven by CSS (`:root[data-skills-poured]` or
-    // `[data-orbit-state="revealed"]`), but `inert` must be toggled
-    // imperatively — CSS can't add/remove HTML attributes. Initial inert
-    // mirrors visibility: returning visitors (pre-paint script has set
-    // the root attribute) start with fully interactive orbiters; first-
-    // time visitors start with everything inert until emergence.
     const alreadyPoured =
       document.documentElement.hasAttribute("data-skills-poured");
-    for (const el of orbiters) {
-      el.toggleAttribute("inert", !alreadyPoured);
+    if (alreadyPoured) {
+      for (const el of orbiters) el.removeAttribute("inert");
+    } else {
+      const partialCount = readEmittedCount();
+      const totalChips = document.querySelectorAll(
+        "[data-skill-chip]",
+      ).length;
+      const restoreTarget =
+        partialCount > 0 && totalChips > 0
+          ? Math.floor((partialCount / totalChips) * orbiters.length)
+          : 0;
+      if (restoreTarget > 0) {
+        perspective.setAttribute("data-restored", "");
+        requestAnimationFrame(() => {
+          perspective.removeAttribute("data-restored");
+        });
+      }
+      for (let i = 0; i < orbiters.length; i++) {
+        if (i < restoreTarget) {
+          orbiters[i].dataset.orbitState = "revealed";
+          orbiters[i].removeAttribute("inert");
+        } else {
+          orbiters[i].toggleAttribute("inert", true);
+        }
+      }
     }
 
     function revealUpTo(n: number) {

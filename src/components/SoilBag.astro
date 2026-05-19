@@ -453,6 +453,11 @@ const locale = getLocale(Astro.currentLocale);
 </style>
 
 <script>
+  import {
+    SKILLS_EMITTED_COUNT_KEY,
+    readEmittedCount,
+  } from "@/lib/skills-storage";
+
   // ------------------------------------------------------------------
   // SoilBag — two-stage interaction:
   //   Stage 1 (cut): horizontal swipe ≥ CUT_THRESHOLD_PX opens the bag
@@ -491,6 +496,8 @@ const locale = getLocale(Astro.currentLocale);
     rot: number;
     angVel: number;
   };
+
+  const bagCleanups = new WeakMap<HTMLElement, () => void>();
 
   function setProgress(bag: HTMLElement, p: number) {
     bag.style.setProperty("--cut-progress", String(Math.max(0, Math.min(1, p))));
@@ -630,6 +637,7 @@ const locale = getLocale(Astro.currentLocale);
     } catch {
       // ignore (private mode etc.)
     }
+    const alreadyEmittedCount = readEmittedCount();
 
     // ---- Physics tick ------------------------------------------------
     function tick(now: number) {
@@ -693,6 +701,11 @@ const locale = getLocale(Astro.currentLocale);
       const chip = groupChips.find((c) => c.dataset.state === "hidden");
       if (!chip) return "done";
       emittedTotal++;
+      try {
+        localStorage.setItem(SKILLS_EMITTED_COUNT_KEY, String(emittedTotal));
+      } catch {
+        // ignore (private mode etc.)
+      }
       // Tell the bonsai a chip has landed — BonsaiScene grows one more
       // orbiter when its share of the pour crosses the next threshold.
       document.dispatchEvent(
@@ -742,6 +755,7 @@ const locale = getLocale(Astro.currentLocale);
     let emitTimer: number | null = null;
     function startEmission() {
       if (emitTimer !== null) return;
+      if (emittedTotal >= totalChips) return;
       emitTimer = window.setInterval(() => {
         const result = emitNext();
         if (result === "all") {
@@ -956,6 +970,7 @@ const locale = getLocale(Astro.currentLocale);
       try {
         localStorage.removeItem(STORAGE_CUT);
         localStorage.removeItem(STORAGE_EMPTIED);
+        localStorage.removeItem(SKILLS_EMITTED_COUNT_KEY);
       } catch {
         // ignore
       }
@@ -984,7 +999,23 @@ const locale = getLocale(Astro.currentLocale);
     } else if (alreadyCut) {
       bag.dataset.state = "opened";
       setProgress(bag, 1);
+      if (alreadyEmittedCount > 0) {
+        const n = Math.min(alreadyEmittedCount, totalChips);
+        for (let i = 0; i < n; i++) {
+          allChips[i].dataset.state = "settled";
+        }
+        emittedTotal = n;
+      }
     }
+
+    bagCleanups.set(bag, () => {
+      stopEmission();
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+      flyingChips.length = 0;
+    });
 
     // Keyboard fallback: in sealed state Enter/Space cuts the bag without
     // a swipe; in opened state it pours every remaining chip with no
@@ -1015,6 +1046,7 @@ const locale = getLocale(Astro.currentLocale);
         bag.dataset.state = "empty";
         try {
           localStorage.setItem(STORAGE_EMPTIED, "1");
+          localStorage.setItem(SKILLS_EMITTED_COUNT_KEY, String(totalChips));
         } catch {
           // ignore
         }
@@ -1029,5 +1061,18 @@ const locale = getLocale(Astro.currentLocale);
       .forEach(bindBag);
   }
 
+  function teardownBags() {
+    document
+      .querySelectorAll<HTMLElement>("[data-soil-bag]")
+      .forEach((bag) => {
+        const cleanup = bagCleanups.get(bag);
+        if (cleanup) {
+          cleanup();
+          bagCleanups.delete(bag);
+        }
+      });
+  }
+
   document.addEventListener("astro:page-load", setupBags);
+  document.addEventListener("astro:before-swap", teardownBags);
 </script>
