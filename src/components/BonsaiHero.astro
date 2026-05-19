@@ -21,17 +21,17 @@ const aboutFacets = aboutFacetsByLocale[locale];
     <p
       class="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-[var(--color-accent)]"
     >
-      {ui.heroEyebrow[locale]}
+      {profile.title[locale]}
     </p>
     <h1
-      class="font-display mt-2 text-3xl md:text-5xl lg:text-6xl font-semibold leading-[1.05]"
+      class="font-display mt-2 text-2xl md:text-4xl lg:text-5xl font-semibold leading-[1.05]"
     >
-      <span class="title-underline">{profile.title[locale]}</span><span
+      <span class="title-underline">{ui.heroHeadline[locale]}</span><span
         class="inline-block text-[var(--color-accent)]">.</span
       >
     </h1>
     <p
-      class="mt-2 max-w-2xl text-sm md:text-base text-[var(--color-fg)]/70 leading-relaxed"
+      class="mt-8 max-w-2xl text-sm md:text-base text-[var(--color-fg)]/70 leading-relaxed"
     >
       {profile.tagline[locale]}
     </p>

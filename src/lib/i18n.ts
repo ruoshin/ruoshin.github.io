@@ -46,7 +46,7 @@ export const ui = {
     en: "切換到中文",
   },
 
-  heroEyebrow: {
+  heroHeadline: {
     "zh-Hant": "Hi, I'm Ruoshin",
     en: "Hi, I'm Ruoshin",
   },
