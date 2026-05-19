@@ -7,7 +7,7 @@ import { DEFAULT_LOCALE, LOCALES } from "./src/lib/i18n";
 const sitemapLocales = Object.fromEntries(LOCALES.map((l) => [l, l]));
 
 export default defineConfig({
-  site: "https://ruoshin.github.io",
+  site: "https://ruoshin.wang",
   i18n: {
     locales: [...LOCALES],
     defaultLocale: DEFAULT_LOCALE,

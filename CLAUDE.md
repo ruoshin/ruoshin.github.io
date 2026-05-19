@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Personal portfolio site for Ruoshin Wang (Senior Front-end Engineer), deployed at https://ruoshin.github.io as a GitHub user-page. Primary use case: showcasing experience for job interviews.
+Personal portfolio site for Ruoshin Wang (Senior Front-end Engineer), deployed at https://ruoshin.wang (custom domain, GitHub Pages-hosted user-page). Primary use case: showcasing experience for job interviews.
 
 ## Commands
 
@@ -80,6 +80,10 @@ Experience and project details are **not** a section — they live in [src/compo
 
 ## Deployment
 
-`.github/workflows/deploy.yml` runs on push to `master` (and `workflow_dispatch`), uses `withastro/action@v3` with Node 22, and publishes to GitHub Pages. The repo's **Settings → Pages → Source must be set to "GitHub Actions"** for the deploy step to succeed.
+`.github/workflows/deploy.yml` runs on push to `master` (and `workflow_dispatch`), uses `withastro/action@v3` with Node 22, and publishes to GitHub Pages. The repo's **Settings → Pages → Source must be set to "GitHub Actions"** for the deploy step to succeed (the `actions/deploy-pages@v4` step in the workflow expects this).
+
+The site serves from the custom domain `ruoshin.wang`. Two pieces keep that working:
+- [public/CNAME](public/CNAME) holds the domain string — Astro copies `public/*` into `dist/` verbatim, so each deploy's artifact ships a `CNAME` file and GitHub Pages preserves the custom domain. Deleting this file will drop the domain on the next deploy.
+- `site: "https://ruoshin.wang"` in [astro.config.ts](astro.config.ts) — used by `@astrojs/sitemap` for canonical URLs in `sitemap-index.xml`.
 
 Because this is a `username.github.io` user-page (not a project page), the site lives at the domain root and `base` is `/` — the default. Do not add a `base` to `astro.config.ts`.
