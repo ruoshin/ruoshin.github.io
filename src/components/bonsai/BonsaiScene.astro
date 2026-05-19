@@ -160,11 +160,14 @@ const treeLabel = `${treeRole} · ${treeCompany}`;
        Set back to 0.85 to share the hero viewport with the soil bag and
        leave room for the about/contact strips below — at 1.2 the scene
        took the entire screen on its own. */
+    --bonsai-base-width: 720px;
     --bonsai-scale: 0.85;
     position: relative;
     width: 100%;
-    max-width: calc(720px * var(--bonsai-scale));
+    max-width: calc(var(--bonsai-base-width) * var(--bonsai-scale));
     margin: 0 auto;
+    /* Sets up cqw for the orbit transform below. */
+    container-type: inline-size;
     /* Shorter aspect (was 640/580) trims empty space above the tree;
        pot width at max-width is 60% × 720 = 432px (× --bonsai-scale). */
     aspect-ratio: 720 / 520;
@@ -221,28 +224,17 @@ const treeLabel = `${treeRole} · ${treeCompany}`;
     color: var(--bonsai-clay);
   }
 
-  /* Flat 2D soil (.bonsai-soil-flat) and the matching pot rim
-     (.bonsai-pot-rim) share the same screen-space positioning so the
-     stroked ellipse aligns with the filled one. Positioned the same way
-     as the old 3D disc (left: 50%; bottom: 31% with translate(-50%, 50%)
-     centers on the same point), so the tree and orbiters at bottom: 21%
-     in the stage context still appear to sit on it. Outer ellipse
-     350×140 (rx=175, ry=70) is sized so the inner edge of the 15 CSS px
-     stroke clears the largest plant projection (r=155 → rx=155, ry=53).
-     Fixed in px because plant orbit radii are also fixed in px.
-
-     `bottom: 31%` lands the screen center on the pot body's post-tilt
-     top edge (the pot occupies the bottom ~31% of the container in
-     screen space). Width is scaled ×1.125 vs the viewBox to keep
-     proportional to the 720px-max container, then multiplied by
-     --bonsai-scale so the ellipse grows with the rest of the scene. */
+  /* Flat 2D soil + matching pot rim. ViewBox 350×140 (rx=175, ry=70)
+     was sized so the largest plant projection (r=155) clears the ellipse.
+     Width is %-based to track the %-based .bonsai-pot trapezoid on
+     narrow viewports; 54.7% matches the original desktop pixel width. */
   .bonsai-soil-flat,
   .bonsai-pot-rim {
     position: absolute;
     left: 50%;
     bottom: 31%;
-    width: calc(394px * var(--bonsai-scale));
-    height: calc(158px * var(--bonsai-scale));
+    width: 54.7%;
+    aspect-ratio: 350 / 140;
     transform: translate(-50%, 50%);
     pointer-events: none;
   }
@@ -284,6 +276,9 @@ const treeLabel = `${treeRole} · ${treeCompany}`;
     left: 50%;
     bottom: 31%;
     transform-origin: 50% 100%;
+    /* Keep px-based --r in lockstep with the %-based soil/pot when
+       the container is narrower than max-width. */
+    --orbit-fit: min(1, calc(100cqw / (var(--bonsai-base-width) * var(--bonsai-scale))));
     /* Orbit transform — runs every frame via --rotation (driven by GSAP).
        Note: per-instance `scale(var(--scale))` was lifted out of this chain
        onto the standalone `scale` CSS property below, so the emergence
@@ -293,7 +288,7 @@ const treeLabel = `${treeRole} · ${treeCompany}`;
     transform:
       translate3d(-50%, 0, 0)
       rotateY(calc(var(--theta) + var(--rotation, 0deg)))
-      translate3d(0, 0, calc(var(--r, 100px) * var(--bonsai-scale)))
+      translate3d(0, 0, calc(var(--r, 100px) * var(--bonsai-scale) * var(--orbit-fit)))
       rotateY(calc(-1 * (var(--theta) + var(--rotation, 0deg))))
       rotate(var(--tilt, 0deg));
     /* Emergence: hidden = opacity 0 + scale 0 (sucked into the soil at

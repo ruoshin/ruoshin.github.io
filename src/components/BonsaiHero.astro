@@ -148,7 +148,8 @@ const aboutFacets = aboutFacetsByLocale[locale];
     .bag-slot {
       display: none;
     }
-    .skills-chip {
+    /* Specificity boost over the later `.skills-chip { opacity: 0 }`. */
+    .skills-chip[data-state="hidden"] {
       opacity: 1;
     }
   }
