@@ -9,6 +9,7 @@ import {
   bonsaiDecorations,
   bonsaiTreeExperienceId,
   bonsaiTreeColor,
+  bonsaiTreeColorDark,
 } from "@/data/bonsai-mapping";
 import { experience } from "@/data/experience";
 import { getLocale } from "@/lib/i18n";
@@ -85,7 +86,7 @@ const treeLabel = `${treeRole} · ${treeCompany}`;
       role="button"
       tabindex="0"
       aria-label={treeLabel}
-      style={`color: ${bonsaiTreeColor};`}
+      style={`--c: ${bonsaiTreeColor}; --c-dark: ${bonsaiTreeColorDark};`}
     >
       <Tree class="block w-full" />
       <span class="bonsai-label bonsai-tree-label" aria-hidden="true">
@@ -119,7 +120,7 @@ const treeLabel = `${treeRole} · ${treeCompany}`;
             role="button"
             tabindex="0"
             aria-label={label}
-            style={`color: ${p.color}; --theta: ${p.angle}deg; --r: ${p.radius}px; --tilt: ${p.tilt}deg; --scale: ${p.scale};`}
+            style={`--c: ${p.color};${p.colorDark ? ` --c-dark: ${p.colorDark};` : ""} --theta: ${p.angle}deg; --r: ${p.radius}px; --tilt: ${p.tilt}deg; --scale: ${p.scale};`}
           >
             <Glyph class="block w-full" />
             <span class="bonsai-label bonsai-orbiter-label" aria-hidden="true">
@@ -140,7 +141,7 @@ const treeLabel = `${treeRole} · ${treeCompany}`;
         return (
           <div
             class={`bonsai-orbiter bonsai-${d.kind}`}
-            style={`color: ${d.color}; --theta: ${d.angle}deg; --r: ${d.radius}px; --tilt: ${d.tilt}deg; --scale: ${d.scale};`}
+            style={`--c: ${d.color}; --theta: ${d.angle}deg; --r: ${d.radius}px; --tilt: ${d.tilt}deg; --scale: ${d.scale};`}
           >
             <Glyph class="block w-full" />
           </div>
@@ -256,6 +257,7 @@ const treeLabel = `${treeRole} · ${treeCompany}`;
        width to set the tree's vertical footprint. */
     width: 15%;
     transform: translate3d(-50%, 0, 0);
+    color: var(--c);
   }
   .bonsai-tree:focus-visible {
     outline-offset: 6px;
@@ -276,6 +278,7 @@ const treeLabel = `${treeRole} · ${treeCompany}`;
     left: 50%;
     bottom: 31%;
     transform-origin: 50% 100%;
+    color: var(--c);
     /* Keep px-based --r in lockstep with the %-based soil/pot when
        the container is narrower than max-width. */
     --orbit-fit: min(1, calc(100cqw / (var(--bonsai-base-width) * var(--bonsai-scale))));
@@ -325,6 +328,12 @@ const treeLabel = `${treeRole} · ${treeCompany}`;
   .bonsai-plant { width: 6%; }
   .bonsai-kinoko { width: 8%; }
   .bonsai-flower { width: 5%; }
+
+  /* Dark override; falls through to --c when --c-dark wasn't set. */
+  html.dark .bonsai-tree,
+  html.dark .bonsai-orbiter {
+    color: var(--c-dark, var(--c));
+  }
 
   /* Bloom climax — fired once when the final skill chip is poured. A warm
      radial glow rises behind the scene; the central tree and every orbiter

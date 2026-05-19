@@ -22,6 +22,11 @@ type BonsaiPlant = {
    *  decorations use desaturated hexes so the eye is pulled to the
    *  experience plants and tree first. */
   color: string;
+  /** Dark-mode color override. The light-mode brand hexes are tuned against
+   *  the cream parchment bg; against the warm-earth dark bg they read as
+   *  out-of-palette RGB-bright. Provide a warmer, slightly less saturated
+   *  OKLCH here so brand plants harmonize with the dark accent palette. */
+  colorDark?: string;
   /** Glyph used for the orbiter. Defaults to "plant"; swap when a role
    *  reads better as a different silhouette. */
   kind?: BonsaiOrbiterKind;
@@ -42,9 +47,18 @@ export const bonsaiPlants: BonsaiPlant[] = [
     scale: 0.85,
     tilt: 0,
     color: "#ff485a",
+    colorDark: "oklch(0.72 0.16 25)",
     kind: "kinoko",
   },
-  { experienceId: "infocast", angle: 55, radius: 125, scale: 1.0, tilt: 0, color: "#2eb7e6" },
+  {
+    experienceId: "infocast",
+    angle: 55,
+    radius: 125,
+    scale: 1.0,
+    tilt: 0,
+    color: "#2eb7e6",
+    colorDark: "oklch(0.72 0.12 215)",
+  },
 ];
 
 /** The central tree represents the "main" experience — typically the most
@@ -53,8 +67,10 @@ export const bonsaiPlants: BonsaiPlant[] = [
 export const bonsaiTreeExperienceId = "actuaviz";
 
 /** Tree color — applied inline on the tree element; the SVG fills with
- *  currentColor so any CSS color value works here. */
+ *  currentColor so any CSS color value works here. Dark counterpart sits
+ *  in the warm-earth palette (see colorDark on BonsaiPlant for rationale). */
 export const bonsaiTreeColor = "#407e9f";
+export const bonsaiTreeColorDark = "oklch(0.65 0.10 230)";
 
 /** Decorative orbiters — no experience linkage, just visual fill. */
 type BonsaiDecoration = {
