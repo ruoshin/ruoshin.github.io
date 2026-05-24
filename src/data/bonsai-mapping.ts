@@ -103,16 +103,16 @@ type BonsaiDecoration = {
 // scene are the experience plants (vocus/infocast/tendecay) and the central
 // tree — the visual hierarchy reads "click these" without any extra affordance.
 export const bonsaiDecorations: BonsaiDecoration[] = [
-  { kind: "flower", angle: 5, radius: 70, scale: 0.65, tilt: 0, color: "#ac7575" },
+  { kind: "flower", angle: 5, radius: 70, scale: 0.65, tilt: 0, color: "#ced140" },
   { kind: "kinoko", angle: 22, radius: 115, scale: 0.7, tilt: 0, color: "#807ba5" },
   { kind: "flower", angle: 38, radius: 60, scale: 0.5, tilt: 0, color: "#93854f" },
   { kind: "flower", angle: 80, radius: 80, scale: 0.8, tilt: 0, color: "#698f8c" },
-  { kind: "kinoko", angle: 95, radius: 105, scale: 0.6, tilt: 0, color: "#ae7d61" },
-  { kind: "flower", angle: 130, radius: 65, scale: 0.55, tilt: 0, color: "#ac7575" },
+  { kind: "kinoko", angle: 95, radius: 105, scale: 0.6, tilt: 0, color: "#df814b" },
+  { kind: "flower", angle: 130, radius: 65, scale: 0.55, tilt: 0, color: "#ced140" },
   { kind: "kinoko", angle: 155, radius: 110, scale: 0.7, tilt: 0, color: "#807ba5" },
   { kind: "flower", angle: 175, radius: 75, scale: 0.6, tilt: 0, color: "#93854f" },
-  { kind: "kinoko", angle: 222, radius: 85, scale: 0.55, tilt: 0, color: "#ac7575" },
+  { kind: "kinoko", angle: 222, radius: 85, scale: 0.55, tilt: 0, color: "#ced140" },
   { kind: "flower", angle: 248, radius: 118, scale: 0.7, tilt: 0, color: "#807ba5" },
   { kind: "kinoko", angle: 270, radius: 90, scale: 0.65, tilt: 0, color: "#698f8c" },
-  { kind: "flower", angle: 290, radius: 120, scale: 0.8, tilt: 0, color: "#ae7d61" },
+  { kind: "flower", angle: 290, radius: 120, scale: 0.8, tilt: 0, color: "#df814b" },
 ];
