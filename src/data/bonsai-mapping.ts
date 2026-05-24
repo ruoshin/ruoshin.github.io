@@ -59,6 +59,15 @@ export const bonsaiPlants: BonsaiPlant[] = [
     color: "#2eb7e6",
     colorDark: "oklch(0.72 0.12 215)",
   },
+  {
+    experienceId: "tendecay",
+    angle: 195,
+    radius: 122,
+    scale: 0.95,
+    tilt: 0,
+    color: "#5a9d6b",
+    colorDark: "oklch(0.72 0.12 145)",
+  },
 ];
 
 /** The central tree represents the "main" experience — typically the most
@@ -91,8 +100,8 @@ type BonsaiDecoration = {
 // every adjacent pair differing by ≥25 so no two close-angle items ever
 // share a ring.
 // Colors are deliberately low-chroma so the only saturated spots in the
-// scene are the experience plants (vocus/infocast) and the central tree —
-// the visual hierarchy reads "click these" without any extra affordance.
+// scene are the experience plants (vocus/infocast/tendecay) and the central
+// tree — the visual hierarchy reads "click these" without any extra affordance.
 export const bonsaiDecorations: BonsaiDecoration[] = [
   { kind: "flower", angle: 5, radius: 70, scale: 0.65, tilt: 0, color: "#ac7575" },
   { kind: "kinoko", angle: 22, radius: 115, scale: 0.7, tilt: 0, color: "#807ba5" },
@@ -102,7 +111,6 @@ export const bonsaiDecorations: BonsaiDecoration[] = [
   { kind: "flower", angle: 130, radius: 65, scale: 0.55, tilt: 0, color: "#ac7575" },
   { kind: "kinoko", angle: 155, radius: 110, scale: 0.7, tilt: 0, color: "#807ba5" },
   { kind: "flower", angle: 175, radius: 75, scale: 0.6, tilt: 0, color: "#93854f" },
-  { kind: "plant", angle: 195, radius: 122, scale: 0.75, tilt: 0, color: "#ae7d61" },
   { kind: "kinoko", angle: 222, radius: 85, scale: 0.55, tilt: 0, color: "#ac7575" },
   { kind: "flower", angle: 248, radius: 118, scale: 0.7, tilt: 0, color: "#807ba5" },
   { kind: "kinoko", angle: 270, radius: 90, scale: 0.65, tilt: 0, color: "#698f8c" },

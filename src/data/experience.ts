@@ -56,6 +56,44 @@ export const experience: Experience[] = [
     stack: ["React", "TypeScript", "Office.js", "Tailwind CSS", "Jest", "Playwright", "Figma"],
   },
   {
+    id: "tendecay",
+    company: "苔息 Tendecay",
+    shortName: tx("苔息", "Tendecay"),
+    role: tx("個人專案", "Side project"),
+    period: "2026 — Present",
+    summary: tx(
+      "苔息 Tendecay 是一款密閉生態瓶模擬遊戲。玩家只擺放土壤、水、苔蘚孢子，菌絲、藻類、地衣、蘭花皆由規則自行產生。基於嚴格的養分守恆定律，每一個生態瓶都會走過獨一無二的演替路徑。Pixel Art 美術 + 自製 2.5D 渲染管線，呈現透過玻璃觀看微縮世界的儀式感。整個專案以 Vibe Coding 模式與 Claude Code 協作完成，重點在示範 doc-to-code 的設計流程，以及 AI 重度參與時如何維持嚴謹的系統架構。",
+      'Tendecay is a sealed-jar ecosphere simulation game. Players only place soil, water, and moss spores — mycelium, algae, lichen, and orchids all emerge from the rules. Under strict nutrient conservation, every jar walks its own succession path. Pixel art paired with a custom 2.5D render pipeline captures the ritual of peering into a miniature world through glass. Built end-to-end in close collaboration with Claude Code ("vibe coding") to demonstrate the doc-to-code design workflow and how a disciplined system architecture survives heavy AI co-authorship.',
+    ),
+    highlights: [
+      tx(
+        "結合生態學知識、遊戲設計與工程實作，從概念到 prototype 獨立完成",
+        "Solo-built from concept to prototype, weaving together ecology knowledge, game design, and engineering.",
+      ),
+      tx(
+        "全程與 Claude Code 協作開發，主導設計、架構、debug 引導與品質把關",
+        "Built end-to-end in close collaboration with Claude Code — leading design, architecture, debugging direction, and quality control.",
+      ),
+      tx(
+        "建立 CLAUDE.md + MEMORY.md + 設計文件三層 context 系統，讓 AI 跨 session 維持一致性",
+        "Designed a three-layer context system (CLAUDE.md + MEMORY.md + design docs) so the AI stays coherent across sessions.",
+      ),
+      tx(
+        "自訂分層架構 + 設計文件先行（doc-to-code 對應），讓 AI 在規則內實作",
+        "Custom layered architecture with a design-docs-first workflow (doc-to-code correspondence) so the AI implements within explicit boundaries.",
+      ),
+      tx(
+        "為 pixel art 自製 in-browser painter 工具：含調色、預覽、與主遊戲 sprite atlas 雙向匯入匯出",
+        "Built an in-browser pixel-art painter — palette editor, live preview, and two-way import/export with the main game's sprite atlas.",
+      ),
+      tx(
+        "從零打造 Pixel Art 2.5D 渲染管線",
+        "Custom 2.5D render pipeline — Z-sort, Y-axis compression, autotile, deferred flush, and glass lighting.",
+      ),
+    ],
+    stack: ["Phaser 3", "TypeScript", "Vite", "Vitest"],
+  },
+  {
     id: "vocus",
     company: "新銳數位 / vocus.cc",
     shortName: tx("vocus.cc", "vocus.cc"),

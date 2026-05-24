@@ -11,6 +11,9 @@ import reportToolNote01 from "@/assets/images/reporttoolnote01.jpg";
 import reportToolNote02 from "@/assets/images/reporttoolnote02.jpg";
 import synoptos01 from "@/assets/images/synoptos01.png";
 import synoptos02 from "@/assets/images/synoptos02.png";
+import tendecay01 from "@/assets/images/tendecay01.png";
+import tendecay02 from "@/assets/images/tendecay02.png";
+import tendecay03 from "@/assets/images/tendecay03.png";
 import vocus01 from "@/assets/images/v01.png";
 import vocus02 from "@/assets/images/v02.png";
 import { type Localized, tx } from "@/lib/i18n";
@@ -79,6 +82,23 @@ export const projects: Project[] = [
       { src: vocus02, alt: tx("vocus.cc 介面截圖二", "vocus.cc UI screenshot 2") },
     ],
     stack: ["Next.js", "React", "Storybook", "SCSS"],
+  },
+  {
+    id: "tendecay",
+    experienceId: "tendecay",
+    name: "苔息 Tendecay",
+    client: tx("生態瓶模擬遊戲", "Ecosphere simulation"),
+    images: [
+      { src: tendecay01, alt: tx("苔息 Tendecay 介面截圖一", "Tendecay UI screenshot 1") },
+      { src: tendecay02, alt: tx("苔息 Tendecay 介面截圖二", "Tendecay UI screenshot 2") },
+      {
+        src: tendecay03,
+        alt: tx(
+          "為繪製遊戲 pixel art 自製的小工具",
+          "Custom mini-tool built for drawing the game's pixel art",
+        ),
+      },
+    ],
   },
   {
     id: "nucleus",
